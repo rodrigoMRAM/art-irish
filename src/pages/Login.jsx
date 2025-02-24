@@ -3,7 +3,7 @@ import React from 'react'
 export const Login = () => {
   return (
     <main class="form-signin w-100 vh-100 d-flex align-items-center justify-content-center">
-  <form th:action="@{/login}" method="post"  class="w-50">
+  <form action="/login" method="post"  class="w-50">
     
     <h1 class="h3 mb-3 fw-normal">Inicie Sesión</h1>
 

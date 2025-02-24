@@ -32,18 +32,18 @@ export const Home = () => {
                     </tr>
                 </thead>
                 <tbody class={`${theme === 'dark' ? 'table-dark': 'table-light'} no-wrap`}>
-                    <tr th:each="siniestro : ${siniestros}">
-                        <td th:text="${siniestro.numStro}"></td>
-                        <td class="fecha" th:text="${siniestro.fechaIngreso}"></td>
-                        <td class="fecha" th:text="${siniestro.fecha_vencimiento}"></td>
-                        <td th:text="${siniestro.tipoStro}"></td>
-                        <td th:text="${siniestro.resultado}"></td>
-                        <td th:text="${siniestro.fechaYHoraStro}"></td>
-                        <td th:text="${siniestro.gravedad}"></td>
-                        <td th:text="${siniestro.lesiones}"></td>
-                        <td th:text="${siniestro.lugar_direccion}"></td>
-                        <td th:text="${siniestro.lugar_entrecalles}"></td>
-                        <td th:text="${siniestro.localidad}"></td>
+                    <tr>
+                        <td></td>
+                        <td class="fecha" ></td>
+                        <td class="fecha" ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
                     </tr>
                 </tbody>
             </table>

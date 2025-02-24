@@ -10,7 +10,7 @@ body[data-theme='light'] {
   color: black;
 }
 
-/* Estilo para el modo oscuro */
+
 body[data-theme='dark'] {
   background-color: rgb(33, 37, 41);
   color: white;
@@ -20,7 +20,7 @@ body[data-theme='light'] .dark-mode{
   color: black!important;
 }
 
-/* Estilo para el modo oscuro */
+
 body[data-theme='dark'] .dark-mode{
   color: white!important;
 }

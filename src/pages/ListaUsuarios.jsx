@@ -23,12 +23,12 @@ export const ListaUsuarios = () => {
                     </tr>
                 </thead>
                  <tbody class={`${theme === 'dark' ? 'table-dark': 'table-light'} no-wrap`}>
-                    <tr th:each="usuario : ${usuarios}">
-                        <td th:text="${usuario.dni}"></td>
-                         <td th:text="${usuario.nombre}"></td>
-                         <td th:text="${usuario.apellido}"></td>
-                        <td th:text="${usuario.email}"></td>
-                           <td th:text="${usuario.rol}"></td>
+                    <tr>
+                        <td></td>
+                         <td></td>
+                         <td></td>
+                        <td></td>
+                           <td></td>
                             <td><a class="btn btn-success btn-sm">Modificar</a></td>
                              <td><a class="btn btn-danger btn-sm">Eliminar</a></td>
                     </tr>
