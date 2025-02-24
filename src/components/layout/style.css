@@ -1,0 +1,13 @@
+.dropdown-hover:hover {
+  color: black!important;
+}
+
+.vr{
+    display: inline-block;
+    align-self: stretch;
+    width: 1px;
+    color: white;
+    min-height: 1em;
+    background-color: currentcolor;
+    opacity: .25;
+}
