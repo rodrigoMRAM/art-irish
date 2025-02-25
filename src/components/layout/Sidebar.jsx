@@ -5,61 +5,60 @@ import { useTheme } from '../../utils/ThemeState'
 
 export const Sidebar = () => {
     const { theme, toggleTheme } = useTheme();
-    console.log(theme)
 
 
   return (
-    <nav class={`navbar navbar-expand-sm navbar-dark ${theme === 'dark' ?  'bg-dark' : 'bg-light'} shadow `} aria-label="Third navbar example">
-    <div class="container-fluid">
-        <Link class={`navbar-brand text-white dark-mode`} to={"/"} >| Estudio<b><span class="text-warning strong">Irish </span></b>|</Link>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+    <nav className={`navbar navbar-expand-sm navbar-dark ${theme === 'dark' ?  'bg-dark' : 'bg-light'} shadow `} aria-label="Third navbar example">
+    <div className="container-fluid">
+        <Link className={`navbar-brand text-white dark-mode`} to={"/"} >| Estudio<b><span className="text-warning strong">Irish </span></b>|</Link>
+        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false" aria-label="Toggle navigation">
+            <span className="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarsExample03">
-            <ul class="navbar-nav me-auto mb-2 mb-sm-0">
-                <li class="nav-item">
-                    <Link class={`nav-link dark-mode active text-white`} aria-current="page" to={"/"} >Home</Link>
+        <div className="collapse navbar-collapse" id="navbarsExample03">
+            <ul className="navbar-nav me-auto mb-2 mb-sm-0">
+                <li className="nav-item">
+                    <Link className={`nav-link dark-mode active text-white`} aria-current="page" to={"/"} >Home</Link>
                 </li>
 
 
-                <li class="nav-item dropdown">
-                    <Link class="nav-link dark-mode dropdown-toggle" to="#" data-bs-toggle="dropdown" aria-expanded="true">Herramientas</Link>
-                    <ul class="dropdown-menu bg-dark">
-                        <li><Link class="dropdown-item text-light dropdown-hover" to={"#"}>Agregar Asegurado </Link></li>
-                        <li><Link class="dropdown-item text-light dropdown-hover" to={"#"}>Agregar Auditor</Link></li>
-                        <li><Link class="dropdown-item text-light dropdown-hover" to={"/siniestros"}>Cargar Siniestro</Link></li>
+                <li className="nav-item dropdown">
+                    <Link className="nav-link dark-mode dropdown-toggle" to="#" data-bs-toggle="dropdown" aria-expanded="true">Herramientas</Link>
+                    <ul className="dropdown-menu bg-dark">
+                        <li><Link className="dropdown-item text-light dropdown-hover" to={"/asegurado"}>Agregar Asegurado </Link></li>
+                        <li><Link className="dropdown-item text-light dropdown-hover" to={"#"}>Agregar Auditor</Link></li>
+                        <li><Link className="dropdown-item text-light dropdown-hover" to={"/siniestros"}>Cargar Siniestro</Link></li>
 
                     </ul>
                 </li>
                 
-                <li class="nav-item dropdown">
-                    <Link class="nav-link dark-mode dropdown-toggle" to="#" data-bs-toggle="dropdown" aria-expanded="true">Consultas</Link>
-                    <ul class="dropdown-menu bg-dark">
-                        <li><Link class="dropdown-item text-light dropdown-hover" to={"/usuario/listar"}>Listar Usuarios</Link></li>
-                        <li><Link class="dropdown-item text-light dropdown-hover" to={"/siniestros/listar"}>Ver Siniestros</Link></li>
-                        <li><Link class="dropdown-item text-light dropdown-hover" to={"#"}>Listar Auditores</Link></li>
-                        <li><Link class="dropdown-item text-light dropdown-hover" to={"#"}>Ver Clientes</Link></li>
+                <li className="nav-item dropdown">
+                    <Link className="nav-link dark-mode dropdown-toggle" to="#" data-bs-toggle="dropdown" aria-expanded="true">Consultas</Link>
+                    <ul className="dropdown-menu bg-dark">
+                        <li><Link className="dropdown-item text-light dropdown-hover" to={"/usuario/listar"}>Listar Usuarios</Link></li>
+                        <li><Link className="dropdown-item text-light dropdown-hover" to={"/siniestros/listar"}>Ver Siniestros</Link></li>
+                        <li><Link className="dropdown-item text-light dropdown-hover" to={"#"}>Listar Auditores</Link></li>
+                        <li><Link className="dropdown-item text-light dropdown-hover" to={"#"}>Ver Clientes</Link></li>
 
                     </ul>
                 </li>
                 
-                <li class="nav-item">
-                    <Link class="nav-link dark-mode active" to={"/registro"}>Nuevo Usuario</Link>
+                <li className="nav-item">
+                    <Link className="nav-link dark-mode active" to={"/registro"}>Nuevo Usuario</Link>
                 </li>
             </ul>
 
-            <div class="navbar-nav mb-2 mb-sm-0">
-                <li class="nav-item dropdown">
-                    <Link class="text-warning nav-link  dropdown-toggle"  to="#" data-bs-toggle="dropdown" aria-expanded="true"><b>Rodrigo Maciel</b></Link>
-                    <ul class="dropdown-menu bg-dark">
-                        <li> <Link th:to={"/logout"} class="dropdown-item text-warning">Cerrar Sesión</Link></li>   
+            <div className="navbar-nav mb-2 mb-sm-0">
+                <li className="nav-item dropdown">
+                    <Link className="text-warning nav-link  dropdown-toggle"  to="#" data-bs-toggle="dropdown" aria-expanded="true"><b>Rodrigo Maciel</b></Link>
+                    <ul className="dropdown-menu bg-dark">
+                        <li> <Link th:to={"/logout"} className="dropdown-item text-warning">Cerrar Sesión</Link></li>   
                     </ul>  
                 </li>
             </div>
-            <div class="vr dark-mode"></div>
-            <div class="d-flex align-items-center">
-                {theme === 'dark' ? <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-moon-stars-fill mx-3" viewBox="0 0 16 16">
+            <div className="vr dark-mode"></div>
+            <div className="d-flex align-items-center">
+                {theme === 'dark' ? <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" className="bi bi-moon-stars-fill mx-3" viewBox="0 0 16 16">
   <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/>
   <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/>
 </svg> : <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="#ffc107" className=' mx-3'>
@@ -75,9 +74,9 @@ export const Sidebar = () => {
 </svg>}
                                           
 
-  <div class="form-check form-switch">
-                <label class="form-check-label" for="flexSwitchCheckChecked"></label>
-  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked"  checked={theme === 'dark'} onClick={toggleTheme} 
+  <div className="form-check form-switch">
+                <label className="form-check-label" htmlFor="flexSwitchCheckChecked"></label>
+  <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked"  checked={theme === 'dark' ? true : false} onClick={toggleTheme} 
  />
 </div>
             </div>

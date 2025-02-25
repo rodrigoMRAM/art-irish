@@ -1,18 +1,37 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useTheme } from '../utils/ThemeState';
+import useSiniestros from '../hooks/useSiniestro';
+
 
 export const ListarSiniestros = () => {
+    const { siniestros, loading, error, deleteSiniestro } = useSiniestros();
     const { theme } = useTheme();
-  return (
-    <main class="mt-5 px-5">
-            {/* <div th:if="${param.exito}" class="text-center">
-                <p class="alert alert-info">Siniestro cargado Exitosamente!!</p>
-            </div> */}
-            <h2 class="pt-5">Lista de Siniestros</h2>
+    const [showModal, setShowModal] = useState(false);
+    const [selectedSiniestro, setSelectedSiniestro] = useState(null);
+    console.log(selectedSiniestro)
+    const handleDelete = (id) => {
+        console.log(id)
+        deleteSiniestro(id);
+        setShowModal(false);
+    };
+
+    const handleShowModal = (siniestro) => {
+        setSelectedSiniestro(siniestro);
+        setShowModal(true);
+    };
+
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+        return new Date(dateString).toLocaleString(undefined, options);
+    };
+
+    return (
+        <main className="mt-5 px-5">
+            <h2 className="pt-5">Lista de Siniestros</h2>
             <br/>
             
-            <table class="table table-striped table-bordered table-hover no-wrap">
-                <thead class={`${theme === 'dark' ? 'table-dark': 'table-light'} no-wrap`}>
+            <table className="table table-striped table-bordered table-hover no-wrap">
+                <thead className={`${theme === 'dark' ? 'table-dark': 'table-light'} no-wrap`}>
                     <tr>
                         <th>Número Stro.</th>
                         <th>Fecha de Ingreso</th>
@@ -32,29 +51,50 @@ export const ListarSiniestros = () => {
                         <th>Eliminar</th>
                     </tr>
                 </thead>
-                <tbody class={`${theme === 'dark' ? 'table-dark': 'table-light'} no-wrap`}>
-                    <tr>
-                        <td ></td>
-                        <td class="fecha"></td>
-                        <td class="fecha"></td>
-                        <td ></td>
-                        <td ></td>
-                        <td ></td>
-                        <td ></td>
-                        <td ></td>
-                        <td ></td>
-                        <td ></td>
-                        <td ></td>
-                        <td ></td>
-                        <td></td>                   
-                        <td></td>
-
-                        <td><a class="btn btn-success btn-sm">Modificar</a></td>
-                        <td><a class="btn btn-danger btn-sm">Eliminar</a></td>
-                    </tr>
+                <tbody className={`${theme === 'dark' ? 'table-dark': 'table-light'} no-wrap`}>
+                    {siniestros.map((data, index) => (
+                        <tr key={index}>
+                            <td>{data.numStro}</td>
+                            <td className="fecha">{formatDate(data.fechaIngreso)}</td>
+                            <td className="fecha">{formatDate(data.fecha_vencimiento)}</td>
+                            <td>{data.tipoStro}</td>
+                            <td>{data.resultado}</td>
+                            <td>{formatDate(data.fechaYHoraStro)}</td>
+                            <td>{data.gravedad}</td>
+                            <td>{data.lesiones}</td>
+                            <td>{data.lugar_direccion}</td>
+                            <td>{data.lugar_entrecalles}</td>
+                            <td>{data.localidad}</td>
+                            <td>{data.provincia}</td>
+                            <td>{data.nombrePrestadorMedico}</td>
+                            <td>{data.patologiasInculpables}</td>
+                            <td><a className="btn btn-success btn-sm">Modificar</a></td>
+                            <td><a className="btn btn-danger btn-sm" onClick={() => handleShowModal(data)}>Eliminar</a></td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
 
+            {/* Modal de Bootstrap */}
+            {selectedSiniestro && (
+                <div className={`modal fade ${showModal ? 'show' : ''}`} style={{ display: showModal ? 'block' : 'none' }} tabIndex="-1" role="dialog">
+                    <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title text-black">Confirmar Eliminación</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowModal(false)} aria-label="Close"></button>
+                            </div>
+                            <div className="modal-body text-black">
+                                <p>¿Estás seguro de que deseas eliminar el siniestro {selectedSiniestro.numStro}?</p>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancelar</button>
+                                <button type="button" className="btn btn-danger" onClick={() => handleDelete(selectedSiniestro.idStro)}>Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
   )
 }

@@ -5,17 +5,17 @@ export const Home = () => {
 
 
   return (
-    <main class="mt-5 px-5">
-            {/* <div th:if="${param.exito}" class="text-center">
-                <p class="alert alert-info">Siniestro cargado Exitosamente!!</p>
+    <main className="mt-5 px-5">
+            {/* <div th:if="${param.exito}" className="text-center">
+                <p className="alert alert-info">Siniestro cargado Exitosamente!!</p>
             </div> */}
-            <h2 class="pt-5">Bienvenido a Estudio Irish</h2>
+            <h2 className="pt-5">Bienvenido a Estudio Irish</h2>
             <br/>
-             <h4 class="text-danger">Siniestros vencidos:</h4>
+             <h4 className="text-danger">Siniestros vencidos:</h4>
              <h5>No tienes siniestros vencidos!</h5>
-               <h4 class="text-success mt-5">Siniestros en gestión:</h4>
-            <table class="table table-striped table-bordered table-hover no-wrap">
-                <thead class={`${theme === 'dark' ? 'table-dark': 'table-light'} no-wrap`}>
+               <h4 className="text-success mt-5">Siniestros en gestión:</h4>
+            <table className="table table-striped table-bordered table-hover no-wrap">
+                <thead className={`${theme === 'dark' ? 'table-dark': 'table-light'} no-wrap`}>
                     <tr>
                         <th>Número Stro.</th>
                         <th>Fecha de Ingreso</th>
@@ -31,11 +31,11 @@ export const Home = () => {
                       
                     </tr>
                 </thead>
-                <tbody class={`${theme === 'dark' ? 'table-dark': 'table-light'} no-wrap`}>
+                <tbody className={`${theme === 'dark' ? 'table-dark': 'table-light'} no-wrap`}>
                     <tr>
                         <td></td>
-                        <td class="fecha" ></td>
-                        <td class="fecha" ></td>
+                        <td className="fecha" ></td>
+                        <td className="fecha" ></td>
                         <td ></td>
                         <td ></td>
                         <td ></td>

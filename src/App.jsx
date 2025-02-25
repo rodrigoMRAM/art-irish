@@ -13,6 +13,7 @@ import { ListaUsuarios } from './pages/ListaUsuarios';
 import { ListarSiniestros } from './pages/ListarSiniestros';
 import { Registro } from './pages/Registro';
 import { CargarSiniestro } from './pages/CargarSiniestro';
+import { CargarAsegurado } from './pages/CargarAsegurado';
 function App() {
 
 
@@ -21,11 +22,11 @@ function App() {
     <Routes>
        <Route path="/" element={<Layout />}>
        <Route index element={<Home />} />
-       {/* <Route path="home" element={<Home />} /> */}
        <Route path="/usuario/listar" element={<ListaUsuarios />} />
        <Route path="/siniestros/listar" element={<ListarSiniestros />} />
        <Route path="/registro" element={<Registro />} />
        <Route path="/siniestros" element={<CargarSiniestro />} />
+       <Route path="/asegurado" element={<CargarAsegurado />} />
 
         </Route>
        <Route path="/login" element={<Login />} />
