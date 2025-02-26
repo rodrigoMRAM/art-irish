@@ -8,7 +8,6 @@ export const ListarSiniestros = () => {
     const { theme } = useTheme();
     const [showModal, setShowModal] = useState(false);
     const [selectedSiniestro, setSelectedSiniestro] = useState(null);
-    console.log(selectedSiniestro)
     const handleDelete = (id) => {
         console.log(id)
         deleteSiniestro(id);

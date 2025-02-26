@@ -10,21 +10,26 @@ export const CargarAsegurado = () => {
         <div className="d-flex align-items-center justify-content-between gap-2 ">
           <h1 className="h3 fw-normal text-white dark-mode">Cargar Asegurado</h1>
         </div>
-        <div className="form-floating mb-3">
-          <input type="text" className="form-control" id="nombre" placeholder="Ej: Juan" required />
-          <label htmlFor="nombre">Ingrese nombre</label>
+        <div className="row">
+          <div className="form-floating mb-3 col-md-6">
+            <input type="text" className="form-control" id="nombre" placeholder="Ej: Juan" required />
+            <label htmlFor="nombre">Ingrese nombre</label>
+          </div>
+          <div className="form-floating mb-3 col-md-6">
+            <input type="text" className="form-control" id="cuit" placeholder="Ej: 20-12345678-9" required />
+            <label htmlFor="cuit">Ingrese CUIT</label>
+          </div>
         </div>
-        <div className="form-floating mb-3">
-          <input type="text" className="form-control" id="cuit" placeholder="Ej: 20-12345678-9" required />
-          <label htmlFor="cuit">Ingrese CUIT</label>
-        </div>
-        <div className="form-floating mb-3">
+        <div className="row">
+
+        <div className="form-floating mb-3 col-md-6">
           <input type="tel" className="form-control" id="telefono" placeholder="Ej: 1122334455" required />
           <label htmlFor="telefono">Ingrese teléfono</label>
         </div>
-        <div className="form-floating mb-3">
+        <div className="form-floating mb-3 col-md-6">
           <input type="tel" className="form-control" id="telefonoOpcional" placeholder="Ej: 1122334455" />
           <label htmlFor="telefonoOpcional">Ingrese teléfono (opcional)</label>
+        </div>
         </div>
         <div className="form-floating mb-3">
           <input type="email" className="form-control" id="email" placeholder="Ej: juan@perez.com" required />

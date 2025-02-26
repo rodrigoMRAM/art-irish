@@ -2,7 +2,9 @@ import { useState } from 'react'
 //import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import "bootstrap/dist/css/bootstrap.min.css";  // Estilos de Bootstrap
 import "bootstrap/dist/js/bootstrap.bundle.min"; // JavaScript de Bootstrap
-
+import { Provider } from 'react-redux';
+import { persistor, store } from './redux/store';
+import { PersistGate } from 'redux-persist/integration/react';
 import './App.css'
 import { Layout } from './Layout';
 import { BrowserRouter as Router, Routes, Route }  from 'react-router-dom';
@@ -18,6 +20,8 @@ function App() {
 
 
   return (
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
     <ThemeProvider>
     <Routes>
        <Route path="/" element={<Layout />}>
@@ -27,11 +31,12 @@ function App() {
        <Route path="/registro" element={<Registro />} />
        <Route path="/siniestros" element={<CargarSiniestro />} />
        <Route path="/asegurado" element={<CargarAsegurado />} />
-
         </Route>
        <Route path="/login" element={<Login />} />
     </Routes>
     </ThemeProvider>
+      </PersistGate>
+    </Provider>
   )
 }
 

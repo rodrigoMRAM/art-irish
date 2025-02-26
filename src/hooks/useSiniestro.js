@@ -7,12 +7,20 @@ const useSiniestros = () => {
 
   useEffect(() => {
     const fetchSiniestros = async () => {
+      const token = localStorage.getItem("jwt");
       try {
-        const response = await fetch('http://localhost:8080/api/siniestros');
+        const response = await fetch('http://localhost:8080/siniestros', {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`, // Enviar el token en la cabecera
+          },
+        });
         if (!response.ok) {
           throw new Error('Error al cargar los siniestros');
         }
         const data = await response.json();
+        console.log(data)
         setSiniestros(data);
       } catch (err) {
         setError(err.message);

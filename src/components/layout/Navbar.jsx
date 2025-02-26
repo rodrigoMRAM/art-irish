@@ -2,11 +2,14 @@ import React , { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import './style.css'
 import { useTheme } from '../../utils/ThemeState'
+import useLogout from '../../hooks/useLogout'
+import { useSelector } from 'react-redux';
 
-export const Sidebar = () => {
+export const Navbar = () => {
     const { theme, toggleTheme } = useTheme();
-
-
+    const logout = useLogout();
+    // const user = useSelector((state) => state.user.user.nombre);
+    // console.log(user)
   return (
     <nav className={`navbar navbar-expand-sm navbar-dark ${theme === 'dark' ?  'bg-dark' : 'bg-light'} shadow `} aria-label="Third navbar example">
     <div className="container-fluid">
@@ -52,7 +55,7 @@ export const Sidebar = () => {
                 <li className="nav-item dropdown">
                     <Link className="text-warning nav-link  dropdown-toggle"  to="#" data-bs-toggle="dropdown" aria-expanded="true"><b>Rodrigo Maciel</b></Link>
                     <ul className="dropdown-menu bg-dark">
-                        <li> <Link th:to={"/logout"} className="dropdown-item text-warning">Cerrar Sesión</Link></li>   
+                        <li> <a onClick={logout} className="dropdown-item text-warning">Cerrar Sesión</a></li>   
                     </ul>  
                 </li>
             </div>
