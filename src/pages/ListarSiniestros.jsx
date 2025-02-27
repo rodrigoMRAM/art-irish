@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { useTheme } from '../utils/ThemeState';
 import useSiniestros from '../hooks/useSiniestro';
+import { useNavigate } from 'react-router-dom';
+import { EditarSiniestro } from './EditarSiniestro';
 
 
 export const ListarSiniestros = () => {
@@ -8,6 +10,7 @@ export const ListarSiniestros = () => {
     const { theme } = useTheme();
     const [showModal, setShowModal] = useState(false);
     const [selectedSiniestro, setSelectedSiniestro] = useState(null);
+    const navigate = useNavigate();
     const handleDelete = (id) => {
         console.log(id)
         deleteSiniestro(id);
@@ -23,6 +26,11 @@ export const ListarSiniestros = () => {
         const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
         return new Date(dateString).toLocaleString(undefined, options);
     };
+
+    const handleEdit = (siniestro) => {
+        console.log(siniestro)
+        navigate('/siniestros/editar', { state: { formData: siniestro } });
+      };
 
     return (
         <main className="mt-5 px-5">
@@ -67,7 +75,7 @@ export const ListarSiniestros = () => {
                             <td>{data.provincia}</td>
                             <td>{data.nombrePrestadorMedico}</td>
                             <td>{data.patologiasInculpables}</td>
-                            <td><a className="btn btn-success btn-sm">Modificar</a></td>
+                            <td><a className="btn btn-success btn-sm" onClick={() => handleEdit(data)}>Modificar</a></td>
                             <td><a className="btn btn-danger btn-sm" onClick={() => handleShowModal(data)}>Eliminar</a></td>
                         </tr>
                     ))}

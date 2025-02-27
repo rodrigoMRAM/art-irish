@@ -1,26 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import useSiniestros from '../hooks/useSiniestro';
+import { useLocation } from 'react-router-dom';
 
-export const CargarSiniestro = () => {
-  const { siniestros, loading, error, success, deleteSiniestro, crearSiniestro } = useSiniestros();
-  const [formData, setFormData] = useState({
-    numStro: '',
-    fechaYHoraStro: '',
-    tipoInvestigacion: '',
-    lugar_direccion: '',
-    lugar_entrecalles: '',
-    localidad: '',
-    provincia: '',
-    mechanicaHecho: '',
-    gravedad: '',
-    nombrePrestadorMedico: '',
-    lesiones: '',
-    patologiasInculpables: '',
-    tipoStro: '',
-    resultado: '',
-    tieneRecupero: true,
-    observaciones: ''
-  });
+export const EditarSiniestro = () => {
+  const location = useLocation();
+  const [formData, setFormData] = useState(location.state?.formData || {});
+
+  useEffect(() => {
+    if (location.state?.formData) {
+      setFormData(location.state.formData);
+    }
+  }, [location.state]);
+
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
     setFormData({
@@ -31,65 +21,35 @@ export const CargarSiniestro = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    crearSiniestro(formData);
+    // Lógica para actualizar el siniestro
   };
-  console.log(error)
-
-  useEffect(() => {
-    if (success) {
-      setFormData({
-        numStro: '',
-        fechaYHoraStro: '',
-        tipoInvestigacion: '',
-        lugar_direccion: '',
-        lugar_entrecalles: '',
-        localidad: '',
-        provincia: '',
-        mechanicaHecho: '',
-        gravedad: '',
-        nombrePrestadorMedico: '',
-        lesiones: '',
-        patologiasInculpables: '',
-        tipoStro: '',
-        resultado: '',
-        tieneRecupero: true,
-        observaciones: ''
-      });
-
-    }
-  }, [success]);
 
   return (
     <main className="mt-5 p-5 col-lg-9 m-auto">
       <div>
-
-        {/* <div className="text-center">
-          <p className="alert alert-info">Siniestro cargado Exitosamente!!</p>
-        </div> */}
-        <h2 className="my-3">Cargar nuevo Siniestro</h2>
-     
-        <p className="mb-0 text-danger"></p>
+        <h2 className="my-3">Editar Siniestro {formData.numStro}</h2>
         <form className="row g-3" onSubmit={handleSubmit}>
           <div className="col-md-4">
-            <label htmlFor="numStro" className="form-label dark-mode">Ingrese número de Stro.</label>
+            <label htmlFor="numStro" className="form-label dark-mode">Número de Stro.</label>
             <input type="number" className="form-control" id="numStro" value={formData.numStro} onChange={handleChange} placeholder="Ej: 12345678" />
           </div>
           <div className="col-md-4 mb-3">
-            <label htmlFor="fechaYHoraStro" className="form-label dark-mode">Ingrese fecha y Hora</label>
+            <label htmlFor="fechaYHoraStro" className="form-label dark-mode">Fecha y Hora</label>
             <input type="datetime-local" className="form-control" id="fechaYHoraStro" value={formData.fechaYHoraStro} onChange={handleChange} />
           </div>
           <div className="col-md-4">
-            <label htmlFor="accidentado" className="form-label dark-mode">Accidentado</label>
+            <label htmlFor="tipoInvestigacion" className="form-label dark-mode">Tipo de Investigación</label>
             <select id="tipoInvestigacion" className="form-select" value={formData.tipoInvestigacion} onChange={handleChange}>
               <option value="">Seleccione</option>
-              <option value="Tipo 1">...</option>
-              <option value="Tipo 2">...</option>
+              <option value="Tipo 1">In Situ</option>
+              <option value="Tipo 2">Mixta</option>
+              <option value="Tipo 3">Virtual</option>
             </select>
           </div>
           <hr />
-          <h4 className="my-3 text-warning ">Lugar y descripción del hecho</h4>
+          <h4 className="my-3 text-warning">Lugar y descripción del hecho</h4>
           <div className="col-md-4">
-            <label htmlFor="lugar_direccion" className="form-label dark-mode">Lugar del hecho (Direccion)</label>
+            <label htmlFor="lugar_direccion" className="form-label dark-mode">Lugar del hecho (Dirección)</label>
             <input type="text" className="form-control" id="lugar_direccion" value={formData.lugar_direccion} onChange={handleChange} placeholder="Ej: Cordoba 1000" />
           </div>
           <div className="col-md-3">
@@ -140,7 +100,7 @@ export const CargarSiniestro = () => {
               <option value="">Seleccione</option>
               <option value="Tipo 1">In Situ</option>
               <option value="Tipo 2">Mixta</option>
-              <option value="Tipo 2">Virtual</option>
+              <option value="Tipo 3">Virtual</option>
             </select>
           </div>
           <div className="col-md-3">
@@ -165,7 +125,7 @@ export const CargarSiniestro = () => {
           </div>
           <div className="form-check form-switch col-md-4 mx-2">
             <input className="form-check-input" type="checkbox" role="switch" id="tieneRecupero" checked={formData.tieneRecupero} onChange={handleChange} />
-            <label className="form-check-label  dark-mode" htmlFor="tieneRecupero">Tiene Recupero</label>
+            <label className="form-check-label dark-mode" htmlFor="tieneRecupero">Tiene Recupero</label>
           </div>
           <hr />
           <h4 className="text-warning">Observaciones</h4>
@@ -174,12 +134,8 @@ export const CargarSiniestro = () => {
             <textarea className="form-control" id="observaciones" rows="1" value={formData.observaciones} onChange={handleChange} placeholder="Ingrese observaciones... (opcional)"></textarea>
           </div>
           <div className="col-12">
-          <button type="submit" className="btn btn-warning px-3 float-end">
-              {loading ? 'Cargando...' : 'Cargar Siniestro'}
-            </button>
+            <button type="submit" className="btn btn-warning px-3 float-end">Guardar Cambios</button>
           </div>
-          {error != null  ? <p className='text-danger'>{error}</p> : ''}
-          {success ? <p className='text-success'>Siniestro creado con exito</p> : ''}
         </form>
       </div>
     </main>

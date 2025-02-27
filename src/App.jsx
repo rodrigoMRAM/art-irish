@@ -16,6 +16,7 @@ import { ListarSiniestros } from './pages/ListarSiniestros';
 import { Registro } from './pages/Registro';
 import { CargarSiniestro } from './pages/CargarSiniestro';
 import { CargarAsegurado } from './pages/CargarAsegurado';
+import { EditarSiniestro } from './pages/EditarSiniestro';
 function App() {
 
 
@@ -30,6 +31,7 @@ function App() {
        <Route path="/siniestros/listar" element={<ListarSiniestros />} />
        <Route path="/registro" element={<Registro />} />
        <Route path="/siniestros" element={<CargarSiniestro />} />
+       <Route path="/siniestros/editar" element={<EditarSiniestro />} />
        <Route path="/asegurado" element={<CargarAsegurado />} />
         </Route>
        <Route path="/login" element={<Login />} />

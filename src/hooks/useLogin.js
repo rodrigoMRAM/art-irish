@@ -24,7 +24,7 @@ const useLogin = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Error en el login');
+        throw new Error('Usuario o contraseña incorrectos');
       }
 
       const data = await response.json();
