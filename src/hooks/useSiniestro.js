@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-
+import { useSelector } from 'react-redux';
 const useSiniestros = () => {
   const [siniestros, setSiniestros] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const token = useSelector((state) => state.user.jwt);
 
   useEffect(() => {
     const fetchSiniestros = async () => {
-      const token = localStorage.getItem("jwt");
       try {
         const response = await fetch('http://localhost:8080/siniestros', {
           method: "GET",

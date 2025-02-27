@@ -31,7 +31,6 @@ const useLogin = () => {
 
       // Guarda el usuario en Redux
       dispatch(setUser({ user: username, jwt: data.token }));
-      localStorage.setItem('jwt', data.token);
       navigate('/');
       return data;
     } catch (error) {
