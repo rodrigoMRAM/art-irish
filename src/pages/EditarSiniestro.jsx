@@ -38,12 +38,11 @@ export const EditarSiniestro = () => {
             <input type="datetime-local" className="form-control" id="fechaYHoraStro" value={formData.fechaYHoraStro} onChange={handleChange} />
           </div>
           <div className="col-md-4">
-            <label htmlFor="tipoInvestigacion" className="form-label dark-mode">Tipo de Investigación</label>
+            <label htmlFor="accidentado" className="form-label dark-mode">Accidentado</label>
             <select id="tipoInvestigacion" className="form-select" value={formData.tipoInvestigacion} onChange={handleChange}>
               <option value="">Seleccione</option>
-              <option value="Tipo 1">In Situ</option>
-              <option value="Tipo 2">Mixta</option>
-              <option value="Tipo 3">Virtual</option>
+              <option value="Tipo 1">...</option>
+              <option value="Tipo 2">...</option>
             </select>
           </div>
           <hr />

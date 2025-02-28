@@ -30,8 +30,8 @@ const useLogin = () => {
       const data = await response.json();
 
       // Guarda el usuario en Redux
-      dispatch(setUser({ user: username, jwt: data.token }));
-      navigate('/');
+      dispatch(setUser({ user: data.usuario, jwt: data.token }));
+      navigate('/home');
       return data;
     } catch (error) {
       setError(error.message);

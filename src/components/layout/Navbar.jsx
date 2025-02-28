@@ -8,12 +8,12 @@ import { useSelector } from 'react-redux';
 export const Navbar = () => {
     const { theme, toggleTheme } = useTheme();
     const logout = useLogout();
-    // const user = useSelector((state) => state.user.user.nombre);
-    // console.log(user)
+    const user = useSelector((state) => state.user.user);
+    console.log(user)
   return (
     <nav className={`navbar navbar-expand-sm navbar-dark ${theme === 'dark' ?  'bg-dark' : 'bg-light'} shadow `} aria-label="Third navbar example">
     <div className="container-fluid">
-        <Link className={`navbar-brand text-white dark-mode`} to={"/"} >| Estudio<b><span className="text-warning strong">Irish </span></b>|</Link>
+        <Link className={`navbar-brand text-white dark-mode`} to={"/home"} >| Estudio<b><span className="text-warning strong">Irish </span></b>|</Link>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
         </button>
@@ -21,7 +21,7 @@ export const Navbar = () => {
         <div className="collapse navbar-collapse" id="navbarsExample03">
             <ul className="navbar-nav me-auto mb-2 mb-sm-0">
                 <li className="nav-item">
-                    <Link className={`nav-link dark-mode active text-white`} aria-current="page" to={"/"} >Home</Link>
+                    <Link className={`nav-link dark-mode active text-white`} aria-current="page" to={"/home"} >Home</Link>
                 </li>
 
 
@@ -53,7 +53,7 @@ export const Navbar = () => {
 
             <div className="navbar-nav mb-2 mb-sm-0">
                 <li className="nav-item dropdown">
-                    <Link className="text-warning nav-link  dropdown-toggle"  to="#" data-bs-toggle="dropdown" aria-expanded="true"><b>Rodrigo Maciel</b></Link>
+                    <Link className="text-warning nav-link  dropdown-toggle"  to="#" data-bs-toggle="dropdown" aria-expanded="true"><b>{user.nombre+ ' '+ user.apellido }</b></Link>
                     <ul className="dropdown-menu bg-dark">
                         <li> <a onClick={logout} className="dropdown-item text-warning">Cerrar Sesión</a></li>   
                     </ul>  

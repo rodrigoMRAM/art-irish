@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { useTheme } from '../utils/ThemeState';
 import useSiniestros from '../hooks/useSiniestro';
 import { useNavigate } from 'react-router-dom';
-import { EditarSiniestro } from './EditarSiniestro';
 
 
 export const ListarSiniestros = () => {

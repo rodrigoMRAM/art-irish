@@ -9,8 +9,7 @@ const useLogout = () => {
 
     const logout = () => {
         dispatch(logoutUser());
-        localStorage.removeItem('jwt');
-        navigate('/login');
+        navigate('/');
     };
 
     return logout;

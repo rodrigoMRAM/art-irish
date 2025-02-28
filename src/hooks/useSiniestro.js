@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+
 const useSiniestros = () => {
   const [siniestros, setSiniestros] = useState([]);
   const [loading, setLoading] = useState(true);
