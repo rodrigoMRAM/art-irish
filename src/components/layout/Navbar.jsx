@@ -9,7 +9,6 @@ export const Navbar = () => {
     const { theme, toggleTheme } = useTheme();
     const logout = useLogout();
     const user = useSelector((state) => state.user.user);
-    console.log(user)
   return (
     <nav className={`navbar navbar-expand-sm navbar-dark ${theme === 'dark' ?  'bg-dark' : 'bg-light'} shadow `} aria-label="Third navbar example">
     <div className="container-fluid">

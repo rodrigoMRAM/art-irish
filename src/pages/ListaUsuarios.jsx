@@ -4,11 +4,12 @@ import useListaUsuarios from '../hooks/useListaUsuarios';
 
 export const ListaUsuarios = () => {
     const { theme } = useTheme();
-    const { usuarios, loading, error, deleteUsuario, editUsuario } = useListaUsuarios();
+    const { usuarios, loading, error,success, deleteUsuario, editUsuario } = useListaUsuarios();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [formData, setFormData] = useState({
+        id: '',
         dni: '',
         nombre: '',
         apellido: '',
@@ -43,12 +44,15 @@ export const ListaUsuarios = () => {
 
     const handleEditSubmit = async (e) => {
         e.preventDefault();
-        await editUsuario(selectedUser.dni, formData);
+        await editUsuario(selectedUser.id, formData);
         setShowEditModal(false);
     };
 
     return (
         <main className="mt-5 px-5">
+            {success ? <div  className="text-center">
+               <p className="alert alert-info">Usuario actualizado con éxito.</p>
+           </div>: ''}
             <h2 className="pt-5">Lista de Usuarios</h2>
             <br/>
             <table className="table table-striped table-bordered ">
@@ -88,11 +92,11 @@ export const ListaUsuarios = () => {
                                 <button type="button" className="btn-close" onClick={() => setShowDeleteModal(false)} aria-label="Close"></button>
                             </div>
                             <div className="modal-body text-black">
-                                <p>¿Estás seguro de que deseas eliminar el usuario {selectedUser.dni}?</p>
+                                <p>¿Estás seguro de que deseas eliminar el usuario {selectedUser.nombre+ ' ' + selectedUser.apellido}?</p>
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancelar</button>
-                                <button type="button" className="btn btn-danger" onClick={() => handleDelete(selectedUser.dni)}>Eliminar</button>
+                                <button type="button" className="btn btn-danger" onClick={() => handleDelete(selectedUser.id)}>Eliminar</button>
                             </div>
                         </div>
                     </div>

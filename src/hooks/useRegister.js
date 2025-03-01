@@ -11,9 +11,10 @@ const useRegister = () => {
     setLoading(true);
     setError(null);
     setSuccess(false);
+    console.log({ dni, apellido, nombre, contra, email, rol })
    
     try {
-      const response = await fetch('http://localhost:8080/registro', {
+      const response = await fetch('http://localhost:8080/usuario/registrar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,6 +28,9 @@ const useRegister = () => {
       }
 
       setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
     } catch (err) {
       setError(err.message);
     } finally {

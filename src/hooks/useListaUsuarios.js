@@ -5,6 +5,7 @@ const useListaUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
   const token = useSelector((state) => state.user.jwt);
   
   useEffect(() => {
@@ -31,9 +32,11 @@ const useListaUsuarios = () => {
 
     fetchUsuarios();
   }, []);
+
+
   const deleteUsuario = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/usuarios/${id}`, {
+      const response = await fetch(`http://localhost:8080/usuario/${id}`, {
         method: 'DELETE',
       });
 
@@ -42,7 +45,7 @@ const useListaUsuarios = () => {
       }
 
       // Filtramos el usuario eliminado para actualizar el estado
-      setUsuarios((prevUsuarios) => prevUsuarios.filter((usuario) => usuario.dni !== id));
+      setUsuarios((prevUsuarios) => prevUsuarios.filter((usuario) => usuario.id !== id));
     } catch (err) {
       setError(err.message);
     }
@@ -51,7 +54,7 @@ const useListaUsuarios = () => {
   const editUsuario = async (id, updatedData) => {
     console.log(id, updatedData)
     try {
-      const response = await fetch(`http://localhost:8080/api/usuarios/${id}`, {
+      const response = await fetch(`http://localhost:8080/usuario/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -64,11 +67,14 @@ const useListaUsuarios = () => {
       }
 
       const updatedUsuario = await response.json();
-
-      // Actualizamos el estado con el usuario editado
+      setSuccess(true)
+      setTimeout(() => {
+        setSuccess(false)
+      }
+      , 3000)
       setUsuarios((prevUsuarios) =>
         prevUsuarios.map((usuario) =>
-          usuario.dni === id ? updatedUsuario : usuario
+          usuario.id === id ? updatedUsuario : usuario
         )
       );
     } catch (err) {
@@ -76,7 +82,7 @@ const useListaUsuarios = () => {
     }
   };
 
-  return { usuarios, loading, error, deleteUsuario, editUsuario };
+  return { usuarios, loading, error, success, deleteUsuario, editUsuario };
 };
 
 export default useListaUsuarios;
