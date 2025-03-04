@@ -44,7 +44,7 @@ export const Navbar = () => {
                 aria-current="page"
                 to={"/home"}
               >
-                Home
+                Inicio
               </Link>
             </li>
 
