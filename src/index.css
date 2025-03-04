@@ -6,13 +6,13 @@ body{
 }
 
 body[data-theme='light'] {
-  background-color: white;
-  color: black;
+  background-color: rgb(241, 240, 235);
+  color: #212529;
 }
 
 
 body[data-theme='dark'] {
-  background-color: rgb(33, 37, 41);
+  background-color: #212529;
   color: white;
 }
 

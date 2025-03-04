@@ -38,6 +38,10 @@ const useListaUsuarios = () => {
     try {
       const response = await fetch(`http://localhost:8080/usuario/${id}`, {
         method: 'DELETE',
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // Enviar el token en la cabecera
+        },
       });
 
       if (!response.ok) {
@@ -58,6 +62,7 @@ const useListaUsuarios = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(updatedData),
       });

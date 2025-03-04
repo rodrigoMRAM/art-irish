@@ -1,5 +1,14 @@
 .dropdown-hover:hover {
   color: black!important;
+  cursor: pointer;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+.table-auto-width {
+  width: auto;
+  table-layout: auto;
 }
 
 .vr{
