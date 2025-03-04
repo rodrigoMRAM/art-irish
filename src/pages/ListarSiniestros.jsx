@@ -11,7 +11,6 @@ export const ListarSiniestros = () => {
   const [selectedSiniestro, setSelectedSiniestro] = useState(null);
   const navigate = useNavigate();
   const handleDelete = (id) => {
-    console.log(id);
     deleteSiniestro(id);
     setShowModal(false);
   };
@@ -33,7 +32,6 @@ export const ListarSiniestros = () => {
   };
 
   const handleEdit = (siniestro) => {
-    console.log(siniestro);
     navigate("/siniestros/editar", { state: { formData: siniestro } });
   };
 

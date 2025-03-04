@@ -33,7 +33,6 @@ export const CargarSiniestro = () => {
     e.preventDefault();
     crearSiniestro(formData);
   };
-  console.log(error)
 
   useEffect(() => {
     if (success) {
@@ -103,6 +102,7 @@ export const CargarSiniestro = () => {
           <div className="col-md-2">
             <label htmlFor="provincia" className="form-label dark-mode">Provincia</label>
             <select id="provincia" className="form-select" value={formData.provincia} onChange={handleChange}>
+              <option value="">Seleccione</option>
               <option value="Buenos Aires">Buenos Aires</option>
               <option value="Neuquén">Neuquén</option>
               <option value="Santa Fe">Santa Fe</option>

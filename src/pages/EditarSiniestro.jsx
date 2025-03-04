@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect, use } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import useSiniestros from '../hooks/useSiniestro';
 
 export const EditarSiniestro = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState(location.state?.formData || {});
-
+  const { siniestros, loading, error, updateSiniestros } = useSiniestros();
   useEffect(() => {
     if (location.state?.formData) {
       setFormData(location.state.formData);
@@ -19,9 +21,14 @@ export const EditarSiniestro = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Lógica para actualizar el siniestro
+    try {
+      await updateSiniestros(formData.idStro, formData);  // Esperamos a que termine la actualización
+      navigate('/siniestros/listar'); // Navegamos solo cuando la actualización se haya completado correctamente
+    } catch (error) {
+      console.error("Error al actualizar el siniestro:", error);
+    }
   };
 
   return (
@@ -62,6 +69,7 @@ export const EditarSiniestro = () => {
           <div className="col-md-2">
             <label htmlFor="provincia" className="form-label dark-mode">Provincia</label>
             <select id="provincia" className="form-select" value={formData.provincia} onChange={handleChange}>
+              <option value="">Seleccione</option>
               <option value="Buenos Aires">Buenos Aires</option>
               <option value="Neuquén">Neuquén</option>
               <option value="Santa Fe">Santa Fe</option>
@@ -134,6 +142,7 @@ export const EditarSiniestro = () => {
           </div>
           <div className="col-12">
             <button type="submit" className="btn btn-warning px-3 float-end">Guardar Cambios</button>
+            <button type="submit" className="btn btn-danger px-3 float-end mx-3" onClick={()=>navigate('/siniestros/listar')}>Cancelar</button>
           </div>
         </form>
       </div>

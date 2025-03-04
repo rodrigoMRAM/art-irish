@@ -56,7 +56,6 @@ const useListaUsuarios = () => {
   };
 
   const editUsuario = async (id, updatedData) => {
-    console.log(id, updatedData)
     try {
       const response = await fetch(`http://localhost:8080/usuario/${id}`, {
         method: 'PUT',
