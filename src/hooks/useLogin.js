@@ -10,9 +10,7 @@ const useLogin = () => {
   const navigate = useNavigate();
 
   const loginUser = async (credentials) => {
-    console.log(credentials)
     const { username, password } = credentials;
-    console.log(username)
     setLoading(true);
     setError(null);
 

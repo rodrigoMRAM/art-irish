@@ -33,13 +33,16 @@ export const Registro = () => {
     e.preventDefault();
     if (formData.contra !== contra2) {
       setPasswordError('Las contraseñas no coinciden');
+      setTimeout(() => {
+        setPasswordError(null);
+      }, 3000);
       return;
     }
     setPasswordError(null);
     await register(formData);
     setContra2('');
   };
-
+  
   useEffect(() => {
       if (success) {
         setFormData({

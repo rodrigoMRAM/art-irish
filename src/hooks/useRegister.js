@@ -11,7 +11,6 @@ const useRegister = () => {
     setLoading(true);
     setError(null);
     setSuccess(false);
-    console.log({ dni, apellido, nombre, contra, email, rol })
    
     try {
       const response = await fetch('http://localhost:8080/usuario/registrar', {
@@ -23,14 +22,24 @@ const useRegister = () => {
         body: JSON.stringify({ dni, apellido, nombre, contra, email, rol }),
       });
 
-      if (!response.ok) {
-        throw new Error('Error al registrar el usuario');
-      }
+    let data;
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+    }
+
+
+    if (!response.ok) {
+      throw new Error(data);
+    }
 
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
       }, 3000);
+
     } catch (err) {
       setError(err.message);
     } finally {

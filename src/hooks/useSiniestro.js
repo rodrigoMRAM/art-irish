@@ -22,7 +22,6 @@ const useSiniestros = () => {
           throw new Error('Error al cargar los siniestros');
         }
         const data = await response.json();
-        console.log(data)
         setSiniestros(data);
       } catch (err) {
         setError(err.message);
@@ -78,7 +77,6 @@ const useSiniestros = () => {
         throw new Error('Error al cargar los siniestros');
       }
       const data = await response.json();
-      console.log(data)
       setSiniestros(data);
       setSuccess(true);
       setError(null);
@@ -96,7 +94,6 @@ const useSiniestros = () => {
 
  
   const deleteSiniestro = async (id) => {
-    console.log(id)
     try {
       const response = await fetch(`http://localhost:8080/siniestros/${id}`, {
         method: 'DELETE',
@@ -117,7 +114,37 @@ const useSiniestros = () => {
     }
   };
 
-  return { siniestros, loading, error, success, deleteSiniestro,crearSiniestro };
+  const updateSiniestros = async (id, updatedData) => {
+    try {
+      const response = await fetch(`http://localhost:8080/siniestros/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al editar el siniestro');
+      }
+
+      const updatedSiniestro = await response.json();
+      setSuccess(true)
+      setTimeout(() => {
+        setSuccess(false);
+      }, 2000);
+      setSiniestros((prevSiniestros) =>
+        prevSiniestros.map((siniestro) =>
+          siniestro.idStro === id ? updatedSiniestro : siniestro
+        )
+      );
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  return { siniestros, loading, error, success, deleteSiniestro,crearSiniestro ,updateSiniestros};
 };
 
 export default useSiniestros;
