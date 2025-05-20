@@ -42,7 +42,7 @@ export const ListarSiniestros = () => {
       <h2 className="pt-5">Lista de Siniestros</h2>
       <br />
     <div class="table-responsive">
-      <table className="table table-striped table-hover table-bordered no-wrap">
+      <table className="table table-striped table-hover no-wrap">
         <thead
           className={`${
             theme === "dark" ? "table-dark" : "table-light"
