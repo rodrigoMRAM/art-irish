@@ -1,19 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import useLogin from '../hooks/useLogin';
-import EyeOpen from '../assets/visibility.svg?react';
-import EyeClosed from '../assets/visibilityOff.svg?react';
+import React, { useState, useEffect } from "react";
+import useLogin from "../hooks/useLogin";
+import EyeOpen from "../assets/visibility.svg?react";
+import EyeClosed from "../assets/visibilityOff.svg?react";
 export const Login = () => {
   const { loginUser, loading, error } = useLogin();
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
+    username: "",
+    password: "",
   });
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-
   useEffect(() => {
-    const rememberedUsername = localStorage.getItem('rememberedUsername');
+    const rememberedUsername = localStorage.getItem("rememberedUsername");
     if (rememberedUsername) {
       setFormData((prevFormData) => ({
         ...prevFormData,
@@ -25,7 +24,7 @@ export const Login = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (type === 'checkbox') {
+    if (type === "checkbox") {
       setRememberMe(checked);
     } else {
       setFormData({
@@ -40,13 +39,13 @@ export const Login = () => {
     try {
       await loginUser(formData);
       if (rememberMe) {
-        localStorage.setItem('rememberedUsername', formData.username);
+        localStorage.setItem("rememberedUsername", formData.username);
       } else {
-        localStorage.removeItem('rememberedUsername');
+        localStorage.removeItem("rememberedUsername");
       }
       // Redirigir o realizar alguna acción después del login exitoso
     } catch (error) {
-      console.error('Usuario o contraseña incorrecto', error);
+      console.error("Usuario o contraseña incorrecto", error);
     }
   };
   const togglePasswordVisibility = () => {
@@ -88,7 +87,11 @@ export const Login = () => {
             className="btn  position-absolute end-0 top-0 mt-2 me-2"
             onClick={togglePasswordVisibility}
           >
-            {showPassword ?  <img src={EyeClosed} alt="" /> :  <img src={EyeOpen} alt="" />}
+            {showPassword ? (
+              <img src={EyeClosed} alt="" />
+            ) : (
+              <img src={EyeOpen} alt="" />
+            )}
           </button>
         </div>
 
@@ -101,17 +104,25 @@ export const Login = () => {
             checked={rememberMe}
             onChange={handleChange}
           />
-          <label className="form-check-label dark-mode" htmlFor="flexCheckDefault">
+          <label
+            className="form-check-label dark-mode"
+            htmlFor="flexCheckDefault"
+          >
             Recuerdame
           </label>
         </div>
-        <button className="btn btn-warning w-100 py-2" type="submit" disabled={loading}>
-          {loading ? 'Cargando...' : 'Iniciar Sesión'}
+        <button
+          className="btn btn-warning w-100 py-2"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Cargando..." : "Iniciar Sesión"}
         </button>
         {error && <p className="text-danger mt-3">{error}</p>}
-        <p className="mt-5 mb-3 text-body-secondary nav-link dark-mode">| Estudio <b className="text-warning strong">Irish</b> | © 2025</p>
+        <p className="mt-5 mb-3 text-body-secondary nav-link dark-mode">
+          | Estudio <b className="text-warning strong">Irish</b> | © 2025
+        </p>
       </form>
-     
     </main>
   );
 };

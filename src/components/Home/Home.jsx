@@ -1,20 +1,22 @@
 import React from 'react'
 import { useTheme } from '../../utils/ThemeState';
+import { useSelector } from "react-redux";
+
 export const Home = () => {
     const { theme } = useTheme();
+    const user = useSelector((state) => state.user.user);
 
 
   return (
     <main className="mt-5 px-5">
-            {/* <div th:if="${param.exito}" className="text-center">
-                <p className="alert alert-info">Siniestro cargado Exitosamente!!</p>
-            </div> */}
-            <h2 className="pt-5">Bienvenido a Estudio Irish</h2>
+           
+            <h3 className="pt-5">Bienvenido, {user?.nombre.trim()}! </h3>
+            
             <br/>
              <h4 className="text-danger">Siniestros vencidos:</h4>
              <h5>No tienes siniestros vencidos!</h5>
                <h4 className="text-success mt-5">Siniestros en gestión:</h4>
-            <table className="table table-striped table-bordered table-hover no-wrap">
+            <table className="table table-striped table-hover no-wrap">
                 <thead className={`${theme === 'dark' ? 'table-dark': 'table-light'} no-wrap`}>
                     <tr>
                         <th>Número Stro.</th>

@@ -23,7 +23,8 @@ export const ThemeProvider = ({ children }) => {
 
   useEffect(() => {
     // Aplicar el tema en el body para cambiar el estilo global
-    document.body.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-bs-theme', theme);
+
   }, [theme]);
 
   return (

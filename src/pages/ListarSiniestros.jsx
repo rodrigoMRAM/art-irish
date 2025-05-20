@@ -106,7 +106,7 @@ export const ListarSiniestros = () => {
           >
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title text-black">
+                <h5 className="modal-title">
                   Confirmar Eliminación
                 </h5>
                 <button
@@ -116,7 +116,7 @@ export const ListarSiniestros = () => {
                   aria-label="Close"
                 ></button>
               </div>
-              <div className="modal-body text-black">
+              <div className="modal-body">
                 <p>
                   ¿Estás seguro de que deseas eliminar el siniestro{" "}
                   {selectedSiniestro.numStro}?

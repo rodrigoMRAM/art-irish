@@ -11,13 +11,14 @@ export const Navbar = () => {
   const user = useSelector((state) => state.user.user);
   return (
     <nav
-      className={`navbar navbar-expand-sm navbar-dark fixed-top ${
-        theme === "dark" ? "bg-dark" : "bg-light"
-      } shadow `}
-      aria-label="Third navbar example"
-    >
+  className={`navbar navbar-expand-sm ${
+    theme === "dark" ? "navbar-dark bg-dark" : "navbar-light bg-light"
+  } fixed-top shadow`}
+  aria-label="Third navbar example"
+>
+
       <div className="container-fluid">
-        <Link className={`navbar-brand text-white dark-mode`} to={"/home"}>
+        <Link className={`navbar-brand`} to={"/home"}>
           | Estudio
           <b>
             <span className="text-warning strong">Irish </span>
@@ -40,7 +41,7 @@ export const Navbar = () => {
           <ul className="navbar-nav me-auto mb-2 mb-sm-0">
             <li className="nav-item">
               <Link
-                className={`nav-link dark-mode active text-white`}
+                className={`nav-link active`}
                 aria-current="page"
                 to={"/home"}
               >
@@ -50,21 +51,17 @@ export const Navbar = () => {
 
             <li className="nav-item dropdown">
               <Link
-                className="nav-link dark-mode dropdown-toggle"
+                className="nav-link dropdown-toggle"
                 to="#"
                 data-bs-toggle="dropdown"
                 aria-expanded="true"
               >
                 Herramientas
               </Link>
-              <ul className={`dropdown-menu ${
-        theme === "dark" ? "bg-dark" : "bg-light"
-      }`}>
+              <ul className={`dropdown-menu `}>
                 <li>
                   <Link
-                    className={`dropdown-item ${
-                      theme === "dark" ? "text-light" : "text-dark"
-                    } text-light dropdown-hover`}
+                    className={`dropdown-item`}
                     to={"/asegurado"}
                   >
                     Agregar Asegurado{" "}
@@ -72,9 +69,7 @@ export const Navbar = () => {
                 </li>
                 <li>
                   <Link
-                    className={`dropdown-item ${
-                      theme === "dark" ? "text-light" : "text-dark"
-                    } text-light dropdown-hover`}
+                    className={`dropdown-item`}
                     to={"#"}
                   >
                     Agregar Auditor
@@ -82,9 +77,7 @@ export const Navbar = () => {
                 </li>
                 <li>
                   <Link
-                    className={`dropdown-item ${
-                      theme === "dark" ? "text-light" : "text-dark"
-                    } text-light dropdown-hover`}
+                    className={`dropdown-item`}
                     to={"/siniestros"}
                   >
                     Cargar Siniestro
@@ -95,21 +88,17 @@ export const Navbar = () => {
 
             <li className="nav-item dropdown">
               <Link
-                className="nav-link dark-mode dropdown-toggle"
+                className="nav-link dropdown-toggle"
                 to="#"
                 data-bs-toggle="dropdown"
                 aria-expanded="true"
               >
                 Consultas
               </Link>
-              <ul className={`dropdown-menu ${
-        theme === "dark" ? "bg-dark" : "bg-light"
-      }`}>
+              <ul className={`dropdown-menu`}>
                 <li>
                   <Link
-                    className={`dropdown-item ${
-                      theme === "dark" ? "text-light" : "text-dark"
-                    } dropdown-hover`}
+                    className={`dropdown-item`}
                     to={"/usuario/listar"}
                   >
                     Listar Usuarios
@@ -117,9 +106,7 @@ export const Navbar = () => {
                 </li>
                 <li>
                   <Link
-                    className={`dropdown-item ${
-                      theme === "dark" ? "text-light" : "text-dark"
-                    } dropdown-hover`}
+                    className={`dropdown-item`}
                     to={"/siniestros/listar"}
                   >
                     Ver Siniestros
@@ -127,9 +114,7 @@ export const Navbar = () => {
                 </li>
                 <li>
                   <Link
-                    className={`dropdown-item ${
-                      theme === "dark" ? "text-light" : "text-dark"
-                    } dropdown-hover`}
+                    className={`dropdown-item`}
                     to={"#"}
                   >
                     Listar Auditores
@@ -137,9 +122,7 @@ export const Navbar = () => {
                 </li>
                 <li>
                   <Link
-                    className={`dropdown-item ${
-                      theme === "dark" ? "text-light" : "text-dark"
-                    } dropdown-hover`}
+                    className={`dropdown-item`}
                     to={"#"}
                   >
                     Ver Clientes
@@ -149,7 +132,7 @@ export const Navbar = () => {
             </li>
 
             <li className="nav-item">
-              <Link className="nav-link dark-mode active" to={"/registro"}>
+              <Link className="nav-link active" to={"/registro"}>
                 Nuevo Usuario
               </Link>
             </li>
@@ -165,17 +148,17 @@ export const Navbar = () => {
               >
                 <b>{user?.nombre + " " + user?.apellido}</b>
               </Link>
-              <ul className="dropdown-menu bg-dark">
+              <ul className="dropdown-menu">
                 <li className="nav-item dropdown">
                   {" "}
-                  <a onClick={logout} className={`dropdown-item text-light dropdown-hover`}>
+                  <a onClick={logout} className={`dropdown-item dropdown-hover`}>
                     Cerrar Sesión
                   </a>
                 </li>
               </ul>
             </li>
           </div>
-          <div className="vr dark-mode"></div>
+          <div className="vr"></div>
           <div className="d-flex align-items-center">
             {theme === "dark" ? (
               <svg
