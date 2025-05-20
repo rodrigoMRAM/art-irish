@@ -83,6 +83,14 @@ export const Navbar = () => {
                     Cargar Siniestro
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    className={`dropdown-item`}
+                    to={"/clientes"}
+                  >
+                    Nuevo Cliente
+                  </Link>
+                </li>
               </ul>
             </li>
 

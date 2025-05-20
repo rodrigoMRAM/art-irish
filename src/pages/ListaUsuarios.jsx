@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useTheme } from "../utils/ThemeState";
 import useListaUsuarios from "../hooks/useListaUsuarios";
+import { useNavigate } from "react-router-dom";
 
 export const ListaUsuarios = () => {
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const { usuarios, loading, error, success, deleteUsuario, editUsuario } =
     useListaUsuarios();
@@ -58,7 +60,15 @@ export const ListaUsuarios = () => {
       ) : (
         ""
       )}
-      <h2 className="pt-5">Lista de Usuarios</h2>
+       <div className="d-flex justify-content-between align-items-center pt-5">
+      <h2>Lista de Usuarios</h2>
+      <button
+        className="btn btn-warning mb-3"
+        onClick={() => navigate("/registro")}
+      >
+        Nuevo Usuario
+      </button>
+      </div>
       <br />
       <table className="table table-striped">
         <thead
@@ -77,9 +87,7 @@ export const ListaUsuarios = () => {
           </tr>
         </thead>
         <tbody
-          className={`${
-            theme === "dark" ? "table-dark" : "table-light"
-          } no-wrap`}
+          className={`no-wrap table-group-divider`}
         >
           {usuarios.map((usuario, index) => (
             <tr key={index}>

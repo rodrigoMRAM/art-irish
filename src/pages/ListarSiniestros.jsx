@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTheme } from "../utils/ThemeState";
 import useSiniestros from "../hooks/useSiniestro";
 import { useNavigate } from "react-router-dom";
-import  DeleteIcon  from "../assets/icons/delete.svg?react";
+import DeleteIcon from "../assets/icons/delete.svg?react";
 
 export const ListarSiniestros = () => {
   const { siniestros, loading, error, deleteSiniestro } = useSiniestros();
@@ -37,61 +37,64 @@ export const ListarSiniestros = () => {
 
   return (
     <main className="mt-5 px-5">
-      <h2 className="pt-5">Lista de Siniestros</h2>
+      <div className="d-flex justify-content-between align-items-center pt-5">
+        <h2 className="">Lista de Siniestros</h2>
+        <button
+          className="btn btn-warning mb-3"
+          onClick={() => navigate("/siniestros")}
+        >
+          Nvo Siniestro
+        </button>
+      </div>
       <br />
-    <div class="table-responsive">
-      <table className="table table-striped table-hover no-wrap">
-        <thead
-          className={`${
-            theme === "dark" ? "table-dark" : "table-light"
-          } no-wrap`}
-        >
-          <tr>
-            <th>Número Stro.</th>
-            <th>Fecha de Ingreso</th>
-            <th>Fecha de Vto.</th>
-            <th>Tipo de Stro.</th>
-            <th>Lugar del hecho</th>
-            <th>Localidad</th>
-            <th>Provincia</th>
-            <th></th>
-           
-          </tr>
-        </thead>
-        <tbody
-          className={`${
-            theme === "dark" ? "table-dark" : "table-light"
-          } no-wrap table-group-divider`}
-        >
-          {siniestros.map((data, index) => (
-            <tr key={index}>
-              <td>{data.numStro}</td>
-              <td className="fecha">{formatDate(data.fechaIngreso)}</td>
-              <td className="fecha">{formatDate(data.fecha_vencimiento)}</td>
-              <td>{data.tipoStro}</td>
-              <td>{data.lugar_direccion}</td>
-              <td>{data.localidad}</td>
-              <td>{data.provincia}</td>
-
-              <td>
-              <a
-                  className="mx-2 btn btn-sm btn-outline-warning"
-                  onClick={() => handleEdit(data)}
-                >
-                  Editar
-                </a>
-                <a 
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => handleShowModal(data)}
-                >
-                  <DeleteIcon />
-                </a>
-              </td>
+      <div class="table-responsive">
+        <table className="table table-striped table-hover no-wrap">
+          <thead
+            className={`${
+              theme === "dark" ? "table-dark" : "table-light"
+            } no-wrap`}
+          >
+            <tr>
+              <th>Número Stro.</th>
+              <th>Fecha de Ingreso</th>
+              <th>Fecha de Vto.</th>
+              <th>Tipo de Stro.</th>
+              <th>Lugar del hecho</th>
+              <th>Localidad</th>
+              <th>Provincia</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody className={`no-wrap table-group-divider`}>
+            {siniestros.map((data, index) => (
+              <tr key={index}>
+                <td>{data.numStro}</td>
+                <td className="fecha">{formatDate(data.fechaIngreso)}</td>
+                <td className="fecha">{formatDate(data.fecha_vencimiento)}</td>
+                <td>{data.tipoStro}</td>
+                <td>{data.lugar_direccion}</td>
+                <td>{data.localidad}</td>
+                <td>{data.provincia}</td>
+
+                <td>
+                  <a
+                    className="mx-2 btn btn-sm btn-outline-warning"
+                    onClick={() => handleEdit(data)}
+                  >
+                    Editar
+                  </a>
+                  <a
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleShowModal(data)}
+                  >
+                    <DeleteIcon />
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {/* Modal de Bootstrap */}
       {selectedSiniestro && (
         <div
@@ -106,9 +109,7 @@ export const ListarSiniestros = () => {
           >
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">
-                  Confirmar Eliminación
-                </h5>
+                <h5 className="modal-title">Confirmar Eliminación</h5>
                 <button
                   type="button"
                   className="btn-close"
