@@ -7,11 +7,12 @@ const useSiniestros = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const token = useSelector((state) => state.user.jwt);
+  const API_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const fetchSiniestros = async () => {
       try {
-        const response = await fetch('http://localhost:8080/siniestros', {
+        const response = await fetch(`${API_URL}/siniestros`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -50,7 +51,7 @@ const useSiniestros = () => {
     tieneRecupero,
     observaciones}) => {
     try {
-      const response = await fetch('http://localhost:8080/siniestros', {
+      const response = await fetch(`${API_URL}/siniestros`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -95,7 +96,7 @@ const useSiniestros = () => {
  
   const deleteSiniestro = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8080/siniestros/${id}`, {
+      const response = await fetch(`${API_URL}/siniestros/${id}`, {
         method: 'DELETE',
         headers: {
           "Content-Type": "application/json",
@@ -116,7 +117,7 @@ const useSiniestros = () => {
 
   const updateSiniestros = async (id, updatedData) => {
     try {
-      const response = await fetch(`http://localhost:8080/siniestros/${id}`, {
+      const response = await fetch(`${API_URL}/siniestros/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

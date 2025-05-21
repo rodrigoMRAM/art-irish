@@ -6,6 +6,7 @@ const useRegister = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const token = useSelector((state) => state.user.jwt);
+  const API_URL = import.meta.env.VITE_API_BASE_URL;
 
   const register = async ({ dni, apellido, nombre, contra, email, rol }) => {
     setLoading(true);
@@ -13,7 +14,7 @@ const useRegister = () => {
     setSuccess(false);
    
     try {
-      const response = await fetch('http://localhost:8080/usuario/registrar', {
+      const response = await fetch(`${API_URL}/usuario/registrar`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

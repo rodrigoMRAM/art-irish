@@ -7,11 +7,12 @@ const useListaUsuarios = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const token = useSelector((state) => state.user.jwt);
+  const API_URL = import.meta.env.VITE_API_BASE_URL;
   
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await fetch('http://localhost:8080/usuario/listar', {
+        const response = await fetch(`${API_URL}/usuario/listar`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -36,7 +37,7 @@ const useListaUsuarios = () => {
 
   const deleteUsuario = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8080/usuario/${id}`, {
+      const response = await fetch(`${API_URL}/usuario/${id}`, {
         method: 'DELETE',
         headers: {
           "Content-Type": "application/json",
@@ -57,7 +58,7 @@ const useListaUsuarios = () => {
 
   const editUsuario = async (id, updatedData) => {
     try {
-      const response = await fetch(`http://localhost:8080/usuario/${id}`, {
+      const response = await fetch(`${API_URL}/usuario/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

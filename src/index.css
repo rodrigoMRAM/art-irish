@@ -5,18 +5,18 @@ body{
   height: 100%;
 }
 
-/* html[data-bs-theme='light'] {
+/*  html[data-bs-theme='light'] {
   background-color: #f1f0eb;
   color: #212529;
 }
 
 
-html[data-bs-theme='light'] {
+html[data-bs-theme='dark'] {
   background-color: #212529;
   color: #f1f0eb;
-}
+} */
 
- html[data-bs-theme='light'] .dark-mode{
+/* html[data-bs-theme='light'] .dark-mode{
   color: #212529!important;
 }
 
