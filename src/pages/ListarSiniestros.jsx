@@ -77,18 +77,38 @@ export const ListarSiniestros = () => {
                 <td>{data.provincia}</td>
 
                 <td>
-                  <a
-                    className="mx-2 btn btn-sm btn-outline-warning"
-                    onClick={() => handleEdit(data)}
-                  >
-                    Editar
-                  </a>
-                  <a
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleShowModal(data)}
-                  >
-                    <DeleteIcon />
-                  </a>
+                  <div className="dropdown">
+                    <button
+                      className="btn"
+                      type="button"
+                      id={`dropdownMenuButton-${data.idStro}`}
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      &#x22EE;
+                    </button>
+                    <ul
+                      className="dropdown-menu"
+                      aria-labelledby={`dropdownMenuButton-${data.idStro}`}
+                    >
+                      <li>
+                        <button
+                          className="dropdown-item"
+                          onClick={() => handleEdit(data)}
+                        >
+                          Editar
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          className="dropdown-item text-danger"
+                          onClick={() => handleShowModal(data)}
+                        >
+                          Eliminar
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
                 </td>
               </tr>
             ))}

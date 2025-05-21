@@ -8,6 +8,7 @@ export const ListaUsuarios = () => {
   const { theme } = useTheme();
   const { usuarios, loading, error, success, deleteUsuario, editUsuario } =
     useListaUsuarios();
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -39,10 +40,7 @@ export const ListaUsuarios = () => {
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleEditSubmit = async (e) => {
@@ -53,23 +51,22 @@ export const ListaUsuarios = () => {
 
   return (
     <main className="mt-5 px-5">
-      {success ? (
+      {success && (
         <div className="text-center">
           <p className="alert alert-info">Usuario actualizado con éxito.</p>
         </div>
-      ) : (
-        ""
       )}
-       <div className="d-flex justify-content-between align-items-center pt-5">
-      <h2>Lista de Usuarios</h2>
-      <button
-        className="btn btn-warning mb-3"
-        onClick={() => navigate("/registro")}
-      >
-        Nuevo Usuario
-      </button>
+
+      <div className="d-flex justify-content-between align-items-center pt-5">
+        <h2>Lista de Usuarios</h2>
+        <button
+          className="btn btn-warning mb-3"
+          onClick={() => navigate("/registro")}
+        >
+          Nuevo Usuario
+        </button>
       </div>
-      <br />
+
       <table className="table table-striped">
         <thead
           className={`${
@@ -82,35 +79,50 @@ export const ListaUsuarios = () => {
             <th>Apellido</th>
             <th>Email</th>
             <th>Rol</th>
-            <th>Modificar</th>
-            <th>Eliminar</th>
+            <th></th>
           </tr>
         </thead>
-        <tbody
-          className={`no-wrap table-group-divider`}
-        >
-          {usuarios.map((usuario, index) => (
-            <tr key={index}>
+        <tbody className="no-wrap table-group-divider">
+          {usuarios.map((usuario) => (
+            <tr key={usuario.id}>
               <td>{usuario.dni}</td>
               <td>{usuario.nombre}</td>
               <td>{usuario.apellido}</td>
               <td>{usuario.email}</td>
               <td>{usuario.rol}</td>
               <td>
-                <a
-                  className="btn btn-success btn-sm"
-                  onClick={() => handleShowEditModal(usuario)}
-                >
-                  Modificar
-                </a>
-              </td>
-              <td>
-                <a
-                  className="btn btn-danger btn-sm"
-                  onClick={() => handleShowDeleteModal(usuario)}
-                >
-                  Eliminar
-                </a>
+                <div className="dropdown">
+                  <button
+                    className="btn"
+                    type="button"
+                    id={`dropdownMenuButton-${usuario.id}`}
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    &#x22EE;
+                  </button>
+                  <ul
+                    className="dropdown-menu"
+                    aria-labelledby={`dropdownMenuButton-${usuario.id}`}
+                  >
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleShowEditModal(usuario)}
+                      >
+                        Editar
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item text-danger"
+                        onClick={() => handleShowDeleteModal(usuario)}
+                      >
+                        Eliminar
+                      </button>
+                    </li>
+                  </ul>
+                </div>
               </td>
             </tr>
           ))}
@@ -131,20 +143,18 @@ export const ListaUsuarios = () => {
           >
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">
-                  Confirmar Eliminación
-                </h5>
+                <h5 className="modal-title">Confirmar Eliminación</h5>
                 <button
                   type="button"
                   className="btn-close"
                   onClick={() => setShowDeleteModal(false)}
                   aria-label="Close"
-                ></button>
+                />
               </div>
               <div className="modal-body">
                 <p>
                   ¿Estás seguro de que deseas eliminar el usuario{" "}
-                  {selectedUser.nombre + " " + selectedUser.apellido}?
+                  {selectedUser.nombre} {selectedUser.apellido}?
                 </p>
               </div>
               <div className="modal-footer">
@@ -188,7 +198,7 @@ export const ListaUsuarios = () => {
                   className="btn-close"
                   onClick={() => setShowEditModal(false)}
                   aria-label="Close"
-                ></button>
+                />
               </div>
               <div className="modal-body">
                 <form onSubmit={handleEditSubmit}>
@@ -205,6 +215,7 @@ export const ListaUsuarios = () => {
                     />
                     <label htmlFor="dni">DNI</label>
                   </div>
+
                   <div className="form-floating mb-3">
                     <input
                       type="text"
@@ -218,6 +229,7 @@ export const ListaUsuarios = () => {
                     />
                     <label htmlFor="nombre">Nombre</label>
                   </div>
+
                   <div className="form-floating mb-3">
                     <input
                       type="text"
@@ -231,6 +243,7 @@ export const ListaUsuarios = () => {
                     />
                     <label htmlFor="apellido">Apellido</label>
                   </div>
+
                   <div className="form-floating mb-3">
                     <input
                       type="email"
@@ -244,6 +257,7 @@ export const ListaUsuarios = () => {
                     />
                     <label htmlFor="email">Email</label>
                   </div>
+
                   <div className="form-floating mb-3">
                     <input
                       type="password"
@@ -251,12 +265,13 @@ export const ListaUsuarios = () => {
                       value={formData.contra}
                       onChange={handleEditChange}
                       className="form-control"
-                      id="email"
-                      placeholder="Email"
+                      id="contra"
+                      placeholder="Contraseña"
                       required
                     />
-                    <label htmlFor="email">Contraseña</label>
+                    <label htmlFor="contra">Contraseña</label>
                   </div>
+
                   <div className="form-floating mb-3">
                     <select
                       name="rol"
@@ -266,11 +281,13 @@ export const ListaUsuarios = () => {
                       id="rol"
                       required
                     >
+                      <option value="">Selecciona un rol</option>
                       <option value="ADMINISTRADOR">ADMINISTRADOR</option>
                       <option value="ANALISTA">ANALISTA</option>
                     </select>
                     <label htmlFor="rol">Rol</label>
                   </div>
+
                   <button type="submit" className="btn btn-primary">
                     Guardar Cambios
                   </button>
