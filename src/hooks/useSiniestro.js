@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useState, useEffect, useCallback } from "react";
+import { useSelector } from "react-redux";
 
 const useSiniestros = () => {
   const [siniestros, setSiniestros] = useState([]);
@@ -9,81 +9,48 @@ const useSiniestros = () => {
   const token = useSelector((state) => state.user.jwt);
   const API_URL = import.meta.env.VITE_API_BASE_URL;
 
+  const fetchSiniestros = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/siniestros`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error("Error al cargar los siniestros");
+      const data = await response.json();
+      setSiniestros(data);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [API_URL, token]);
+
   useEffect(() => {
-    const fetchSiniestros = async () => {
-      try {
-        const response = await fetch(`${API_URL}/siniestros`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`, // Enviar el token en la cabecera
-          },
-        });
-        if (!response.ok) {
-          throw new Error('Error al cargar los siniestros');
-        }
-        const data = await response.json();
-        setSiniestros(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchSiniestros();
-  }, []);
+  }, [fetchSiniestros]);
 
-  const crearSiniestro = async ({numStro,
-    fechaYHoraStro,
-    tipoInvestigacion,
-    lugar_direccion,
-    lugar_entrecalles,
-    localidad,
-    provincia,
-    mechanicaHecho,
-    gravedad,
-    nombrePrestadorMedico,
-    lesiones,
-    patologiasInculpables,
-    tipoStro,
-    resultado,
-    tieneRecupero,
-    observaciones}) => {
+  const crearSiniestro = async (payload) => {
+    setLoading(true);
     try {
       const response = await fetch(`${API_URL}/siniestros`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // Enviar el token en la cabecera
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ numStro,
-          fechaYHoraStro,
-          tipoInvestigacion,
-          lugar_direccion,
-          lugar_entrecalles,
-          localidad,
-          provincia,
-          mechanicaHecho,
-          gravedad,
-          nombrePrestadorMedico,
-          lesiones,
-          patologiasInculpables,
-          tipoStro,
-          resultado,
-          tieneRecupero,
-          observaciones} ),
+        body: JSON.stringify(payload),
       });
-      if (!response.ok) {
-        throw new Error('Error al cargar los siniestros');
-      }
+      if (!response.ok) throw new Error("Error al crear el siniestro");
       const data = await response.json();
-      setSiniestros(data);
+      setSiniestros((prev) => [...prev, data]);
       setSuccess(true);
       setError(null);
-      setTimeout(() => {
-        setSuccess(false);
-      }, 2000);
+      setTimeout(() => setSuccess(false), 2000);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -91,61 +58,83 @@ const useSiniestros = () => {
     }
   };
 
-
-
- 
   const deleteSiniestro = async (id) => {
     try {
       const response = await fetch(`${API_URL}/siniestros/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // Enviar el token en la cabecera
+          Authorization: `Bearer ${token}`,
         },
       });
-
-      if (!response.ok) {
-        throw new Error('Error al eliminar el siniestro');
-      }
-
-      // Filtramos el siniestro eliminado para actualizar el estado
-      setSiniestros((prevSiniestros) => prevSiniestros.filter((siniestro) => siniestro.idStro !== id));
+      if (!response.ok) throw new Error("Error al eliminar el siniestro");
+      setSiniestros((prev) => prev.filter((s) => s.idStro !== id));
     } catch (err) {
       setError(err.message);
     }
   };
 
   const updateSiniestros = async (id, updatedData) => {
+    setLoading(true);
     try {
       const response = await fetch(`${API_URL}/siniestros/${id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(updatedData),
       });
-
-      if (!response.ok) {
-        throw new Error('Error al editar el siniestro');
-      }
-
-      const updatedSiniestro = await response.json();
-      setSuccess(true)
-      setTimeout(() => {
-        setSuccess(false);
-      }, 2000);
-      setSiniestros((prevSiniestros) =>
-        prevSiniestros.map((siniestro) =>
-          siniestro.idStro === id ? updatedSiniestro : siniestro
-        )
-      );
+      if (!response.ok) throw new Error("Error al editar el siniestro");
+      const data = await response.json();
+      setSiniestros((prev) => prev.map((s) => (s.idStro === id ? data : s)));
+      setSuccess(true);
+      setError(null);
+      setTimeout(() => setSuccess(false), 2000);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  return { siniestros, loading, error, success, deleteSiniestro,crearSiniestro ,updateSiniestros};
+  const assignAnalista = async (idStro, analistaId) => {
+    try {
+      const res = await fetch(`${API_URL}/siniestros/${idStro}/analista`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ analistaId }), // uuid-string o null
+      });
+      if (!res.ok) throw new Error("No se pudo asignar analista");
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
+
+      setSiniestros((prev) =>
+        prev.map((s) =>
+          s.idStro === idStro
+            ? { ...s, analista: analistaId ? { id: analistaId } : null }
+            : s
+        )
+      );
+      setError(null);
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  return {
+    siniestros,
+    loading,
+    error,
+    success,
+    crearSiniestro,
+    deleteSiniestro,
+    updateSiniestros,
+    assignAnalista,
+  };
 };
 
 export default useSiniestros;

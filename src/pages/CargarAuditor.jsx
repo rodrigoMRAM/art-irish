@@ -109,14 +109,9 @@ export const CargarAuditor = () => {
           <label htmlFor="localidad">Ingrese Localidad</label>
         </div>
         </div>
-        {/* <div th:if="${error != null}" className="d-flex align-items-center alert alert-danger alert-dismissible fade show py-2" role="alert">
-          <p className="mb-0" th:text="${error}"></p>
-          <button type="button" className="btn-close pb-1" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div> */}
         <button className="btn btn-warning float-end" type="submit">
           Guardar
         </button>
-        <p className="mt-5 mb-3 text-white">© 2024 | Estudio Irish</p>
       </form>
     </main>
   );
