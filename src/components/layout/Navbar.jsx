@@ -123,7 +123,7 @@ export const Navbar = () => {
                 <li>
                   <Link
                     className={`dropdown-item`}
-                    to={"#"}
+                    to={"/listar/auditor"}
                   >
                     Listar Auditores
                   </Link>

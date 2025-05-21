@@ -17,10 +17,14 @@ import { CargarSiniestro } from "./pages/CargarSiniestro";
 import { CargarAsegurado } from "./pages/CargarAsegurado";
 import { EditarSiniestro } from "./pages/EditarSiniestro";
 import { CargarAuditor } from "./pages/CargarAuditor";
+import { ListarAuditor } from "./pages/ListarAuditor";
 import { CargarCliente } from "./pages/CargarCliente";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 function App() {
+  const queryClient = new QueryClient();
   return (
+    <QueryClientProvider client={queryClient}>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider>
@@ -92,6 +96,14 @@ function App() {
                 }
               />
               <Route
+                path="/listar/auditor"
+                element={
+                  <PrivateRoute>
+                    <ListarAuditor />
+                  </PrivateRoute>
+                }
+              />
+              <Route
                 path="/cliente"
                 element={
                   <PrivateRoute>
@@ -105,6 +117,7 @@ function App() {
         </ThemeProvider>
       </PersistGate>
     </Provider>
+    </QueryClientProvider>
   );
 }
 

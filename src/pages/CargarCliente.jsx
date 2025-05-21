@@ -1,51 +1,84 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import useCrearArt from "../hooks/useCreateArt"; // Asegurate de importar correctamente
 
 export const CargarCliente = () => {
+  const [form, setForm] = useState({
+    nombreART: "",
+    nombreAnalista: "",
+    apellidoAnalista: "",
+  });
+
+  const { crearArt, loading, error, success } = useCrearArt();
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    crearArt(form);
+  };
+
+  useEffect(() => {
+    if (success) {
+      alert("Cliente creado con éxito");
+      setForm({ nombreART: "", nombreAnalista: "", apellidoAnalista: "" });
+    }
+
+    if (error) {
+      alert(`Error: ${error}`);
+    }
+  }, [success, error]);
+
   return (
-    <main className="mt-5 p-5 col-lg-6 m-auto" >
-      <form className="" action="/registro" method="post">
-        
-        <div className="d-flex align-items-center justify-content-between gap-2 ">
-          <h1 className="h3 fw-normal">
-            Nuevo Cliente
-          </h1>
+    <main className="mt-5 p-5 col-lg-6 m-auto">
+      <form onSubmit={handleSubmit}>
+        <div className="d-flex align-items-center justify-content-between gap-2">
+          <h1 className="h3 fw-normal">Nuevo Cliente</h1>
         </div>
-        
+
         <div className="form-floating mb-3">
           <input
-            type="email"
+            type="text"
             className="form-control"
-            id="cliente"
+            id="nombreART"
             placeholder="Ej: prevencion ART"
+            value={form.nombreART}
+            onChange={handleChange}
             required
           />
-          <label htmlFor="cliente">Nombre ART</label>
+          <label htmlFor="nombreART">Nombre ART</label>
         </div>
+
         <div className="form-floating mb-3">
           <input
             type="text"
             className="form-control"
-            id="nombre"
+            id="nombreAnalista"
             placeholder="Ej: Juan"
+            value={form.nombreAnalista}
+            onChange={handleChange}
             required
           />
-          <label htmlFor="nombre">Nombre Analista</label>
+          <label htmlFor="nombreAnalista">Nombre Analista</label>
         </div>
+
         <div className="form-floating mb-3">
           <input
             type="text"
             className="form-control"
-            id="apellido"
+            id="apellidoAnalista"
             placeholder="Ej: Perez"
+            value={form.apellidoAnalista}
+            onChange={handleChange}
             required
           />
-          <label htmlFor="apellido">Apellido Analista</label>
+          <label htmlFor="apellidoAnalista">Apellido Analista</label>
         </div>
-      
-        <button className="btn btn-warning float-end" type="submit">
-          Guardar
+
+        <button className="btn btn-warning float-end" type="submit" disabled={loading}>
+          {loading ? "Guardando..." : "Guardar"}
         </button>
-       
       </form>
     </main>
   );

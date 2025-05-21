@@ -1,98 +1,126 @@
-import React from "react";
+import React, { useState } from "react";
+import  useCreateAsegurado  from "../hooks/useCreateAsegurado";
 
 export const CargarAsegurado = () => {
+  const [form, setForm] = useState({
+    nombre: "",
+    cuit: "",
+    telefono: "",
+    telefono2: "",
+    email: "",
+    empresa: "",
+    prestadorMedico: "",
+    contactosAsegurado: [
+      {
+        nombre: "",
+        apellido: "",
+        dni: "",
+        sector: "",
+        telefono: "",
+        telefono2: "",
+        email: "",
+      },
+    ],
+  });
+
+  const { crearAsegurado, isLoading, isSuccess, isError, error } = useCreateAsegurado();
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setForm((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleContactoChange = (e, index) => {
+    const { id, value } = e.target;
+    setForm((prev) => {
+      const contactos = [...prev.contactosAsegurado];
+      contactos[index][id] = value;
+      return { ...prev, contactosAsegurado: contactos };
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    crearAsegurado({ ...form, cuit: Number(form.cuit), contactosAsegurado: form.contactosAsegurado.map(c => ({ ...c, dni: Number(c.dni) })) });
+  };
+
   return (
-    <main className="mt-5 p-5 col-lg-6 m-auto" >
-      <form className="" action="/registro" method="post">
-        
-        <div className="d-flex align-items-center justify-content-between gap-2 ">
-          <h1 className="h3 fw-normal">
-            Cargar Asegurado
-          </h1>
+    <main className="mt-5 p-5 col-lg-6 m-auto">
+      <form onSubmit={handleSubmit}>
+        <div className="d-flex align-items-center justify-content-between gap-2">
+          <h1 className="h3 fw-normal">Cargar Asegurado</h1>
         </div>
         <div className="d-flex gap-3">
           <div className="form-floating mb-3 col-md-6">
-            <input
-              type="text"
-              className="form-control"
-              id="nombre"
-              placeholder="Ej: Juan"
-              required
-            />
+            <input type="text" className="form-control" id="nombre" onChange={handleChange} required />
             <label htmlFor="nombre">Ingrese nombre</label>
           </div>
           <div className="form-floating mb-3 col-md-6">
-            <input
-              type="text"
-              className="form-control"
-              id="cuit"
-              placeholder="Ej: 20-12345678-9"
-              required
-            />
+            <input type="text" className="form-control" id="cuit" onChange={handleChange} required />
             <label htmlFor="cuit">Ingrese CUIT</label>
           </div>
-          </div>
-          <div className="d-flex gap-3">
+        </div>
+        <div className="d-flex gap-3">
           <div className="form-floating mb-3 col-md-6">
-            <input
-              type="tel"
-              className="form-control"
-              id="telefono"
-              placeholder="Ej: 1122334455"
-              required
-            />
+            <input type="tel" className="form-control" id="telefono" onChange={handleChange} required />
             <label htmlFor="telefono">Ingrese teléfono</label>
           </div>
           <div className="form-floating mb-3 col-md-6">
-            <input
-              type="tel"
-              className="form-control"
-              id="telefonoOpcional"
-              placeholder="Ej: 1122334455"
-            />
-            <label htmlFor="telefonoOpcional">
-              Ingrese teléfono (opcional)
-            </label>
+            <input type="tel" className="form-control" id="telefono2" onChange={handleChange} />
+            <label htmlFor="telefono2">Ingrese teléfono (opcional)</label>
           </div>
         </div>
         <div className="form-floating mb-3">
-          <input
-            type="email"
-            className="form-control"
-            id="email"
-            placeholder="Ej: juan@perez.com"
-            required
-          />
+          <input type="email" className="form-control" id="email" onChange={handleChange} required />
           <label htmlFor="email">Ingrese e-mail</label>
         </div>
         <div className="form-floating mb-3">
-          <input
-            type="text"
-            className="form-control"
-            id="empresa"
-            placeholder="Ej: Empresa S.A."
-            required
-          />
+          <input type="text" className="form-control" id="empresa" onChange={handleChange} required />
           <label htmlFor="empresa">Ingrese empresa</label>
         </div>
         <div className="form-floating mb-3">
-          <input
-            type="text"
-            className="form-control"
-            id="prestadorMedico"
-            placeholder="Ej: Galeno"
-            required
-          />
+          <input type="text" className="form-control" id="prestadorMedico" onChange={handleChange} required />
           <label htmlFor="prestadorMedico">Ingrese prestador médico</label>
         </div>
-        {/* <div th:if="${error != null}" className="d-flex align-items-center alert alert-danger alert-dismissible fade show py-2" role="alert">
-          <p className="mb-0" th:text="${error}"></p>
-          <button type="button" className="btn-close pb-1" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div> */}
-        <button className="btn btn-warning float-end" type="submit">
-          Guardar
+
+        <h5 className="mt-4">Contacto del Asegurado</h5>
+        <div className="form-floating mb-3">
+          <input type="text" className="form-control" id="nombre" onChange={(e) => handleContactoChange(e, 0)} required />
+          <label htmlFor="nombre">Nombre</label>
+        </div>
+        <div className="form-floating mb-3">
+          <input type="text" className="form-control" id="apellido" onChange={(e) => handleContactoChange(e, 0)} required />
+          <label htmlFor="apellido">Apellido</label>
+        </div>
+        <div className="form-floating mb-3">
+          <input type="text" className="form-control" id="dni" onChange={(e) => handleContactoChange(e, 0)} required />
+          <label htmlFor="dni">DNI</label>
+        </div>
+        <div className="form-floating mb-3">
+          <input type="text" className="form-control" id="sector" onChange={(e) => handleContactoChange(e, 0)} required />
+          <label htmlFor="sector">Sector</label>
+        </div>
+        <div className="d-flex gap-3">
+          <div className="form-floating mb-3 col-md-6">
+            <input type="tel" className="form-control" id="telefono" onChange={(e) => handleContactoChange(e, 0)} required />
+            <label htmlFor="telefono">Teléfono</label>
+          </div>
+          <div className="form-floating mb-3 col-md-6">
+            <input type="tel" className="form-control" id="telefono2" onChange={(e) => handleContactoChange(e, 0)} />
+            <label htmlFor="telefono2">Teléfono alternativo</label>
+          </div>
+        </div>
+        <div className="form-floating mb-3">
+          <input type="email" className="form-control" id="email" onChange={(e) => handleContactoChange(e, 0)} required />
+          <label htmlFor="email">Email</label>
+        </div>
+
+        {isError && <div className="alert alert-danger">{error.message}</div>}
+        {isSuccess && <div className="alert alert-success">Asegurado creado con éxito</div>}
+
+        <button className="btn btn-warning float-end" type="submit" disabled={isLoading}>
+          {isLoading ? "Guardando..." : "Guardar"}
         </button>
-        
       </form>
     </main>
   );

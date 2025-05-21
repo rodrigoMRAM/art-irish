@@ -1,139 +1,113 @@
-import { useState, useEffect, useCallback } from "react";
-import { useSelector } from "react-redux";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
 
 const useSiniestros = () => {
-  const [siniestros, setSiniestros] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
   const token = useSelector((state) => state.user.jwt);
   const API_URL = import.meta.env.VITE_API_BASE_URL;
+  const queryClient = useQueryClient();
 
-  const fetchSiniestros = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/siniestros`, {
-        method: "GET",
+  // 1. Fetch principal
+  const { data: siniestros = [], isLoading, error } = useQuery({
+    queryKey: ['siniestros'],
+    queryFn: async () => {
+      const res = await fetch(`${API_URL}/siniestros`, {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!response.ok) throw new Error("Error al cargar los siniestros");
-      const data = await response.json();
-      setSiniestros(data);
-      setError(null);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [API_URL, token]);
+      if (!res.ok) throw new Error('Error al cargar los siniestros');
+      return res.json();
+    },
+  });
 
-  useEffect(() => {
-    fetchSiniestros();
-  }, [fetchSiniestros]);
-
-  const crearSiniestro = async (payload) => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/siniestros`, {
-        method: "POST",
+  // 2. Crear siniestro
+  const crearMutation = useMutation({
+    mutationFn: async (payload) => {
+      const res = await fetch(`${API_URL}/siniestros`, {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
-      if (!response.ok) throw new Error("Error al crear el siniestro");
-      const data = await response.json();
-      setSiniestros((prev) => [...prev, data]);
-      setSuccess(true);
-      setError(null);
-      setTimeout(() => setSuccess(false), 2000);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (!res.ok) throw new Error('Error al crear el siniestro');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['siniestros'] });
+    },
+  });
 
-  const deleteSiniestro = async (id) => {
-    try {
-      const response = await fetch(`${API_URL}/siniestros/${id}`, {
-        method: "DELETE",
+  // 3. Eliminar siniestro
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      const res = await fetch(`${API_URL}/siniestros/${id}`, {
+        method: 'DELETE',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!response.ok) throw new Error("Error al eliminar el siniestro");
-      setSiniestros((prev) => prev.filter((s) => s.idStro !== id));
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+      if (!res.ok) throw new Error('Error al eliminar el siniestro');
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['siniestros'] });
+    },
+  });
 
-  const updateSiniestros = async (id, updatedData) => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/siniestros/${id}`, {
-        method: "PUT",
+  // 4. Editar siniestro
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, updatedData }) => {
+      const res = await fetch(`${API_URL}/siniestros/${id}`, {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(updatedData),
       });
-      if (!response.ok) throw new Error("Error al editar el siniestro");
-      const data = await response.json();
-      setSiniestros((prev) => prev.map((s) => (s.idStro === id ? data : s)));
-      setSuccess(true);
-      setError(null);
-      setTimeout(() => setSuccess(false), 2000);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (!res.ok) throw new Error('Error al editar el siniestro');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['siniestros'] });
+    },
+  });
 
-  const assignAnalista = async (idStro, analistaId) => {
-    try {
+  // 5. Asignar analista
+  const assignMutation = useMutation({
+    mutationFn: async ({ idStro, analistaId }) => {
       const res = await fetch(`${API_URL}/siniestros/${idStro}/analista`, {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ analistaId }), // uuid-string o null
+        body: JSON.stringify({ analistaId }),
       });
-      if (!res.ok) throw new Error("No se pudo asignar analista");
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
-
-      setSiniestros((prev) =>
-        prev.map((s) =>
-          s.idStro === idStro
-            ? { ...s, analista: analistaId ? { id: analistaId } : null }
-            : s
-        )
-      );
-      setError(null);
-    } catch (e) {
-      setError(e.message);
-    }
-  };
+      if (!res.ok) throw new Error('No se pudo asignar analista');
+      return { idStro, analistaId };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['siniestros'] });
+    },
+  });
 
   return {
     siniestros,
-    loading,
-    error,
-    success,
-    crearSiniestro,
-    deleteSiniestro,
-    updateSiniestros,
-    assignAnalista,
+    loading: isLoading,
+    error: error?.message || null,
+    crearSiniestro: crearMutation.mutate,
+    deleteSiniestro: deleteMutation.mutate,
+    updateSiniestros: updateMutation.mutate,
+    assignAnalista: assignMutation.mutate,
+    isCreating: crearMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
+    isAssigning: assignMutation.isPending,
   };
 };
 
