@@ -16,6 +16,8 @@ import { Registro } from "./pages/Registro";
 import { CargarSiniestro } from "./pages/CargarSiniestro";
 import { CargarAsegurado } from "./pages/CargarAsegurado";
 import { EditarSiniestro } from "./pages/EditarSiniestro";
+import { CargarAuditor } from "./pages/CargarAuditor";
+import { CargarCliente } from "./pages/CargarCliente";
 
 function App() {
   return (
@@ -78,6 +80,22 @@ function App() {
                 element={
                   <PrivateRoute>
                     <CargarAsegurado />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/auditor"
+                element={
+                  <PrivateRoute>
+                    <CargarAuditor />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/cliente"
+                element={
+                  <PrivateRoute>
+                    <CargarCliente />
                   </PrivateRoute>
                 }
               />

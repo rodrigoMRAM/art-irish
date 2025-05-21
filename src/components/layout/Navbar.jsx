@@ -70,7 +70,7 @@ export const Navbar = () => {
                 <li>
                   <Link
                     className={`dropdown-item`}
-                    to={"#"}
+                    to={"/auditor"}
                   >
                     Agregar Auditor
                   </Link>
@@ -86,7 +86,7 @@ export const Navbar = () => {
                 <li>
                   <Link
                     className={`dropdown-item`}
-                    to={"/clientes"}
+                    to={"/cliente"}
                   >
                     Nuevo Cliente
                   </Link>
