@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useTheme } from "../utils/ThemeState";
 import useListaUsuarios from "../hooks/useListaUsuarios";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const ListaUsuarios = () => {
   const navigate = useNavigate();
@@ -22,9 +24,14 @@ export const ListaUsuarios = () => {
     rol: "",
   });
 
-  const handleDelete = (id) => {
-    deleteUsuario(id);
-    setShowDeleteModal(false);
+  const handleDelete = async (id) => {
+    try {
+      await deleteUsuario(id);
+      toast.success("Usuario eliminado con éxito");
+      setShowDeleteModal(false);
+    } catch (error) {
+      toast.error("Error al eliminar usuario");
+    }
   };
 
   const handleShowDeleteModal = (user) => {
@@ -45,17 +52,23 @@ export const ListaUsuarios = () => {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    await editUsuario(selectedUser.id, formData);
-    setShowEditModal(false);
+    try {
+      await editUsuario(selectedUser.id, formData);
+      toast.success("Usuario actualizado con éxito");
+      setShowEditModal(false);
+    } catch (error) {
+      toast.error("Error al actualizar usuario");
+    }
   };
 
   return (
     <main className="mt-5 px-5">
-      {success && (
+      {/* Aquí puedes eliminar el mensaje success ya que toast lo reemplaza */}
+      {/* {success && (
         <div className="text-center">
           <p className="alert alert-info">Usuario actualizado con éxito.</p>
         </div>
-      )}
+      )} */}
 
       <div className="d-flex justify-content-between align-items-center pt-5">
         <h2>Lista de Usuarios</h2>
@@ -297,6 +310,19 @@ export const ListaUsuarios = () => {
           </div>
         </div>
       )}
+
+      {/* Toast Container para mostrar los mensajes */}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={1500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={theme === "dark" ? "dark" : "light"}
+      />
     </main>
   );
 };

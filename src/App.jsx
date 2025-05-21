@@ -18,6 +18,7 @@ import { CargarAsegurado } from "./pages/CargarAsegurado";
 import { EditarSiniestro } from "./pages/EditarSiniestro";
 import { CargarAuditor } from "./pages/CargarAuditor";
 import { ListarAuditor } from "./pages/ListarAuditor";
+import { ListarArt } from "./pages/ListarArt";
 import { CargarCliente } from "./pages/CargarCliente";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -100,6 +101,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <ListarAuditor />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/listar/art"
+                element={
+                  <PrivateRoute>
+                    <ListarArt />
                   </PrivateRoute>
                 }
               />

@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import useRegister from "../hooks/useRegister";
 import EyeOpen from "../assets/visibility.svg?react";
 import EyeClosed from "../assets/visibilityOff.svg?react";
+import { ToastContainer, toast } from 'react-toastify';
+import { useTheme } from '../utils/ThemeState';
 
 export const Registro = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const { theme } = useTheme();
   const [showPasswordRepeat, setShowPasswordRepeat] = useState(false);
   const { register, loading, error, success } = useRegister();
   const [formData, setFormData] = useState({
@@ -29,19 +32,29 @@ export const Registro = () => {
     setContra2(e.target.value);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (formData.contra !== contra2) {
-      setPasswordError("Las contraseñas no coinciden");
-      setTimeout(() => {
-        setPasswordError(null);
-      }, 3000);
-      return;
-    }
-    setPasswordError(null);
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (formData.contra !== contra2) {
+    setPasswordError("Las contraseñas no coinciden");
+    setTimeout(() => {
+      setPasswordError(null);
+    }, 3000);
+    return;
+  }
+
+  setPasswordError(null);
+
+  try {
     await register(formData);
+    toast.success("Usuario registrado con éxito");
     setContra2("");
-  };
+  } catch (error) {
+    toast.error("Error al registrar el usuario");
+  }
+};
+
 
   useEffect(() => {
     if (success) {
@@ -71,16 +84,6 @@ export const Registro = () => {
         method="post"
         onSubmit={handleSubmit}
       >
-        {success ? (
-          <div className="text-center">
-            <p className="alert alert-info">
-              Usuario Registrado Exitosamente!!
-            </p>
-          </div>
-        ) : (
-          ""
-        )}
-
         <div className="d-flex align-items-center justify-content-between gap-2 ">
           <h1 className="h3 fw-normal">Cargar Usuario</h1>
 
@@ -228,6 +231,17 @@ export const Registro = () => {
           Guardar
         </button>
       </form>
+       <ToastContainer
+               position="bottom-right"
+               autoClose={1500}
+               hideProgressBar={false}
+               newestOnTop={false}
+               closeOnClick
+               pauseOnFocusLoss
+               draggable
+               pauseOnHover
+               theme={theme === "dark" ? "dark" : "light"}
+             />
     </main>
   );
 };

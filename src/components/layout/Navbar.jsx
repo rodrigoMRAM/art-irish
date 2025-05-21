@@ -131,7 +131,7 @@ export const Navbar = () => {
                 <li>
                   <Link
                     className={`dropdown-item`}
-                    to={"#"}
+                    to={"/listar/art"}
                   >
                     Ver Clientes
                   </Link>

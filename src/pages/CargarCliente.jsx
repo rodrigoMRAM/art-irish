@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import useCrearArt from "../hooks/useCreateArt"; // Asegurate de importar correctamente
+import { useTheme } from '../utils/ThemeState';
+import { ToastContainer, toast } from 'react-toastify';
 
 export const CargarCliente = () => {
+  const { theme } = useTheme();
   const [form, setForm] = useState({
     nombreART: "",
     nombreAnalista: "",
@@ -15,20 +18,23 @@ export const CargarCliente = () => {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    crearArt(form);
-  };
+  e.preventDefault();
+  crearArt(form, {
+    onSuccess: () => {
+      toast.success("Cliente creado con éxito");
+      setForm({ nombreART: "", nombreAnalista: "", apellidoAnalista: "" });
+    },
+    onError: (error) => {
+      toast.error(`Error: ${error.message}`);
+    },
+  });
+};
 
   useEffect(() => {
     if (success) {
-      alert("Cliente creado con éxito");
       setForm({ nombreART: "", nombreAnalista: "", apellidoAnalista: "" });
     }
-
-    if (error) {
-      alert(`Error: ${error}`);
-    }
-  }, [success, error]);
+  }, [success]);
 
   return (
     <main className="mt-5 p-5 col-lg-6 m-auto">
@@ -80,6 +86,17 @@ export const CargarCliente = () => {
           {loading ? "Guardando..." : "Guardar"}
         </button>
       </form>
+<ToastContainer
+        position="bottom-right"
+        autoClose={1500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={theme === "dark" ? "dark" : "light"}
+      />
     </main>
   );
 };

@@ -1,28 +1,31 @@
 import React, { useState } from "react";
 import  useCreateAsegurado  from "../hooks/useCreateAsegurado";
+import { ToastContainer, toast } from 'react-toastify';
+import { useTheme } from '../utils/ThemeState';
 
 export const CargarAsegurado = () => {
-  const [form, setForm] = useState({
+  const { theme } = useTheme();
+  const initialFormState = {
     nombre: "",
-    cuit: "",
-    telefono: "",
-    telefono2: "",
-    email: "",
-    empresa: "",
-    prestadorMedico: "",
-    contactosAsegurado: [
-      {
-        nombre: "",
-        apellido: "",
-        dni: "",
-        sector: "",
-        telefono: "",
-        telefono2: "",
-        email: "",
-      },
-    ],
-  });
-
+  cuit: "",
+  telefono: "",
+  telefono2: "",
+  email: "",
+  empresa: "",
+  prestadorMedico: "",
+  contactosAsegurado: [
+    {
+      nombre: "",
+      apellido: "",
+      dni: "",
+      sector: "",
+      telefono: "",
+      telefono2: "",
+      email: "",
+    },
+  ],
+};
+const [form, setForm] = useState(initialFormState);
   const { crearAsegurado, isLoading, isSuccess, isError, error } = useCreateAsegurado();
 
   const handleChange = (e) => {
@@ -39,10 +42,27 @@ export const CargarAsegurado = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    crearAsegurado({ ...form, cuit: Number(form.cuit), contactosAsegurado: form.contactosAsegurado.map(c => ({ ...c, dni: Number(c.dni) })) });
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    await crearAsegurado({
+      ...form,
+      cuit: Number(form.cuit),
+      contactosAsegurado: form.contactosAsegurado.map(c => ({
+        ...c,
+        dni: Number(c.dni),
+      })),
+    });
+     setForm(initialFormState);
+    toast.success("Asegurado creado con éxito");
+   
+  } catch (error) {
+    toast.error("Ocurrió un error al crear el asegurado");
+    console.error(error);
+  }
+};
+
 
   return (
     <main className="mt-5 p-5 col-lg-6 m-auto">
@@ -116,12 +136,22 @@ export const CargarAsegurado = () => {
         </div>
 
         {isError && <div className="alert alert-danger">{error.message}</div>}
-        {isSuccess && <div className="alert alert-success">Asegurado creado con éxito</div>}
 
         <button className="btn btn-warning float-end" type="submit" disabled={isLoading}>
           {isLoading ? "Guardando..." : "Guardar"}
         </button>
       </form>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={1500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={theme === "dark" ? "dark" : "light"}
+      />
     </main>
   );
 };
