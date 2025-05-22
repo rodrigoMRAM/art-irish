@@ -37,7 +37,7 @@ export const ListarSiniestros = () => {
     });
 
   const handleEdit = (siniestro) => {
-    navigate("/siniestros/editar", { state: { formData: siniestro } });
+    navigate("/resumen", { state: { formData: siniestro } });
   };
 
   return (
@@ -113,9 +113,9 @@ export const ListarSiniestros = () => {
                       aria-labelledby={`dropdownMenuButton-${data.idStro}`}
                     >
                       <li>
-                        <button className="dropdown-item">
+                        <button className="dropdown-item" onClick={() => handleEdit(data)}>
                           <b>Ver Siniestro</b>
-                          onClick={() => handleEdit(data.idStro)}
+                          
                         </button>
                       </li>
                       <li>

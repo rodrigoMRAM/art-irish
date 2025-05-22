@@ -82,7 +82,7 @@ function App() {
                 }
               />
               <Route
-                path="/resumen/:idStro"
+                path="/resumen"
                 element={
                   <PrivateRoute>
                     <Resumen />

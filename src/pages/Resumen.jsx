@@ -1,13 +1,17 @@
 import React from 'react'
+import { useLocation } from 'react-router-dom';
 
 export const Resumen = () => {
+   const location = useLocation();
+  const { formData } = location.state || {}; 
+
   return (
     <div className="container mt-5">
         
-        <div className="card p-4 mt-5" style={{width: '100%'}}>
+        <div className="card p-4 mt-5 w-full">
   <div className="card-body">
     <div className='d-flex justify-content-between mb-3'>
-    <div className={`navbar-brand`}>
+    <div className='fs-2'>
           | Estudio
           <b>
             <span className="text-warning strong">Irish </span>
@@ -16,17 +20,17 @@ export const Resumen = () => {
         </div>
     <h5 className="card-title">Resumen</h5>
     </div>
-    {/* <h6 className="card-subtitle mb-2 text-muted">Subtítulo</h6> */}
 <div className='d-flex justify-content-between'>
-    <p><strong className='text-warning'>Número de siniestro:</strong> [Número de siniestro]</p>
-    <div>
+    <p><strong className='text-warning'>Número de siniestro:</strong> {formData.idStro}</p>
+    <div className='d-flex flex-column text-end'>
 
-<p><strong className='text-warning'>Fecha:</strong> [Fecha]</p>
-<p><strong className='text-warning'>Cliente:</strong> [Cliente]</p>
+<p><strong className='text-warning'>Fecha:</strong> {formData.fechaYHoraStro}</p>
+<p><strong className='text-warning'>Cliente:</strong> {formData.art}</p>
     </div>
 </div>
 <h2>Datos de trabajador</h2>
-<div className='d-flex justify-content-between'>
+<hr className="shrink-0 bg-divider border-none w-full h-divider" role="separator"></hr>
+<div className='d-flex justify-content-between flex-wrap'>
 <div>
 
 <p><strong className='text-warning'>DNI:</strong> [DNI]</p>
@@ -49,30 +53,38 @@ export const Resumen = () => {
 <p><strong className='text-warning'>Provincia:</strong> [Provincia]</p>
 </div>
 </div>
-<h2>Lugar del hecho</h2>
+<h2 className='mt-4'>Lugar del hecho</h2>
+<hr className="shrink-0 bg-divider border-none w-full h-divider" role="separator"></hr>
 <div>
 
-<p><strong className='text-warning'>Dirección:</strong> [Lugar del hecho]</p>
-<p><strong className='text-warning'>Entre calles:</strong> [Entre calles]</p>
-<p><strong className='text-warning'>Localidad:</strong> [Localidad del hecho]</p>
-<p><strong className='text-warning'>Provincia:</strong> [Provincia del hecho]</p>
-<p><strong className='text-warning'>Mecánica del hecho:</strong> [Mecánica del hecho]</p>
+<p><strong className='text-warning'>Dirección:</strong> {formData.lugar_direccion}</p>
+<p><strong className='text-warning'>Entre calles:</strong> {formData.lugar_entrecalles}</p>
+<p><strong className='text-warning'>Localidad:</strong> {formData.localidad}</p>
+<p><strong className='text-warning'>Provincia:</strong> {formData.provincia}</p>
+<p><strong className='text-warning'>Mecánica del hecho:</strong> {formData.mechanicaHecho}</p>
 </div>
-<h2>Otros detalles</h2>
-<div>
+<h2 className='mt-4'>Detalles</h2>
+<hr className="shrink-0 bg-divider border-none w-full h-divider" role="separator"></hr>
+<div className='d-flex flex-wrap'>
+<div className='col-12 col-md-4'>
 
-<p><strong className='text-warning'>Gravedad:</strong> [Gravedad]</p>
-<p><strong className='text-warning'>Tipo de investigación:</strong> [Tipo de investigación]</p>
-<p><strong className='text-warning'>Prestador médico:</strong> [Prestador médico]</p>
-<p><strong className='text-warning'>Lesiones:</strong> [Lesiones]</p>
-<p><strong className='text-warning'>Patologías inculpables:</strong> [Patologías inculpables]</p>
-<p><strong className='text-warning'>Tipo de siniestro:</strong> [Tipo de siniestro]</p>
-<p><strong className='text-warning'>Resultado:</strong> [Resultado]</p>
+<p><strong className='text-warning'>Gravedad:</strong> {formData.gravedad}</p>
+<p><strong className='text-warning'>Tipo de investigación:</strong> {formData.tipoInvestigacion}</p>
+<p><strong className='text-warning'>Prestador médico:</strong> {formData.nombrePrestadorMedico}</p>
+<p><strong className='text-warning'>Lesiones:</strong> {formData.lesiones}</p>
 </div>
-<p><strong className='text-warning'>Observaciones:</strong> </p>
-<div className="card" style={{width: '100%'}}>
+<div className='col-12 col-md-4'>
+
+<p><strong className='text-warning'>Patologías inculpables:</strong> {formData.patologiasInculpables}</p>
+<p><strong className='text-warning'>Tipo de siniestro:</strong> {formData.tipoStro}</p>
+<p><strong className='text-warning'>Resultado:</strong> {formData.resultado}</p>
+</div>
+</div>
+<h2 className='mt-4'>Observaciones</h2>
+<hr className="shrink-0 bg-divider border-none w-full h-divider" role="separator"></hr>
+<div className="card w-full" >
   <div className="card-body">
-    [Observaciones]
+    {formData.observaciones}
   </div>
   </div>
 
