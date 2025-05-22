@@ -96,6 +96,7 @@ const useSiniestros = () => {
     },
   });
 
+    
   return {
     siniestros,
     loading: isLoading,

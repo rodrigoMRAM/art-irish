@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useArts, useDeleteArt, useUpdateArt } from "../hooks/useGetArt"; // Ajustá path
 import { ToastContainer, toast } from 'react-toastify';
 import { useTheme } from "../utils/ThemeState";
+import DeleteIcon from "../assets/icons/delete.svg?react";
 export const ListarArt = () => {
   const { data: arts = [], isLoading, error } = useArts();
+  
   const { theme } = useTheme();
   const deleteMutation = useDeleteArt();
   const updateMutation = useUpdateArt();
@@ -78,7 +80,7 @@ export const ListarArt = () => {
 
   return (
     <main className="mt-5 px-5">
-      <div className="d-flex justify-content-between align-items-center pt-5">
+        <div className="d-flex justify-content-between align-items-center pt-5">
         <h2>Lista de Clientes</h2>
         <button
           className="btn btn-warning mb-3"
@@ -87,57 +89,48 @@ export const ListarArt = () => {
           Nuevo Cliente
         </button>
       </div>
+     <div className="row">
+  {arts.map((art) => (
+    <div className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4" key={art.idART}>
+      <div className="card h-100 border-0">
+        <div
+          className="d-flex flex-column h-100"
+          style={{ backgroundColor: '#18181B', borderRadius: '10px' }}
+        >
+          <div className="p-3">
+            <h5 className="card-title">{art.nombreART}</h5>
+            <h6 className="card-subtitle mb-2 text-body-secondary">
+              {art.nombreAnalista + ' ' + art.apellidoAnalista}
+            </h6>
+          </div>
+          <hr className="shrink-0 bg-divider border-none w-full h-divider" role="separator"></hr>
+          <div className="p-3 mt-auto">
+            <button
+              type="button"
+              className="btn btn-warning me-2 "
+              onClick={() => handleShowEditModal(art)}
+              disabled={updateMutation.isLoading}
+            >
+              Editar
+            </button>
+            <button
+              type="button"
+              className="btn btn-danger "
+              onClick={() => handleShowDeleteModal(art)}
+              disabled={deleteMutation.isLoading}
+            >
+              Eliminar
+              
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
 
-      <table className="table table-striped">
-        <thead className="table-dark">
-          <tr>
-            <th>Nombre ART</th>
-            <th>Nombre Analista</th>
-            <th>Apellido Analista</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {arts.map((art) => (
-            <tr key={art.idART}>
-              <td>{art.nombreART}</td>
-              <td>{art.nombreAnalista}</td>
-              <td>{art.apellidoAnalista}</td>
-              <td>
-                <div className="dropdown">
-                  <button
-                    className="btn"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    &#x22EE;
-                  </button>
-                  <ul className="dropdown-menu">
-                    <li>
-                      <button
-                        className="dropdown-item"
-                        onClick={() => handleShowEditModal(art)}
-                        disabled={updateMutation.isLoading}
-                      >
-                        Editar
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        className="dropdown-item text-danger"
-                        onClick={() => handleShowDeleteModal(art)}
-                        disabled={deleteMutation.isLoading}
-                      >
-                        Eliminar
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+
 
       {/* Modal de Eliminación */}
       {showDeleteModal && selectedArt && (

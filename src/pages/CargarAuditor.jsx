@@ -38,7 +38,7 @@ export const CargarAuditor = () => {
       cp: '',
       localidad: '',
     })
-      toast.success("Cliente creado con éxito");
+      toast.success("Auditor creado con éxito");
     },
     onError: (error) => {
       toast.error(`Error: ${error.message}`);

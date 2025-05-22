@@ -1,7 +1,33 @@
 import React, { useState, useEffect } from "react";
 import useSiniestros from "../hooks/useSiniestro";
+import { useArts, useDeleteArt, useUpdateArt } from "../hooks/useGetArt";
+import { useCreateTrabajador } from "../hooks/useCreateTrabajador";
+
+const initialFormData = {
+  dni: '',
+  nombre: '',
+  apellido: '',
+  telefono: '',
+  telefono2: '',
+  email: '',
+  calle: '',
+  numero: '',
+  piso: '',
+  depto: '',
+  cp: '',
+  localidad: '',
+  provincia: '',
+};
 
 export const CargarSiniestro = () => {
+  const { data: arts = [], isLoading, error : errorart } = useArts();
+  const {
+    mutate: createTrabajador,
+    isLoading: loadingTrabajador,
+    data: trabajadorCreado,
+    isSuccess: successTrabajador,
+    error: errorTrabajador,
+  } = useCreateTrabajador();
   const {
     siniestros,
     loading,
@@ -14,6 +40,7 @@ export const CargarSiniestro = () => {
     numStro: "",
     fechaYHoraStro: "",
     tipoInvestigacion: "",
+    idart :"",
     lugar_direccion: "",
     lugar_entrecalles: "",
     localidad: "",
@@ -28,6 +55,8 @@ export const CargarSiniestro = () => {
     tieneRecupero: true,
     observaciones: "",
   });
+
+   const [formDataTrabajador, setFormDataTrabajador] = useState(initialFormData);
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
     setFormData({
@@ -47,6 +76,7 @@ export const CargarSiniestro = () => {
         numStro: "",
         fechaYHoraStro: "",
         tipoInvestigacion: "",
+        idart :"",
         lugar_direccion: "",
         lugar_entrecalles: "",
         localidad: "",
@@ -100,20 +130,176 @@ export const CargarSiniestro = () => {
             />
           </div>
           <div className="col-md-4">
-            <label htmlFor="accidentado" className="form-label dark-mode">
-              Accidentado
-            </label>
-            <select
-              id="tipoInvestigacion"
-              className="form-select"
-              value={formData.tipoInvestigacion}
-              onChange={handleChange}
-            >
-              <option value="">Seleccione</option>
-              <option value="Tipo 1">...</option>
-              <option value="Tipo 2">...</option>
-            </select>
-          </div>
+  <label htmlFor="tipoInvestigacion" className="form-label dark-mode">
+    Cliente
+  </label>
+  <select
+    id="idart"
+    className="form-select"
+    value={formData.idart}
+    onChange={handleChange}
+    name="idart"
+  >
+    <option value="">Seleccione</option>
+
+    {arts.map((art) => (
+      <option key={art.id} value={art.id}>
+        {art.nombreART}
+      </option>
+    ))}
+  </select>
+</div>
+   {/* ESPACION */}
+ <hr />
+          <h4 className="my-3 text-warning ">Trabajador</h4>
+          <div className="col-md-3">
+  <label htmlFor="dni" className="form-label dark-mode">DNI</label>
+  <input
+    type="number"
+    className="form-control"
+    id="dni"
+    value={formDataTrabajador.dni}
+    onChange={handleChange}
+    placeholder="Ej: 33874652"
+  />
+</div>
+<div className="col-md-3">
+  <label htmlFor="nombre" className="form-label dark-mode">Nombre</label>
+  <input
+    type="text"
+    className="form-control"
+    id="nombre"
+    value={formDataTrabajador.nombre}
+    onChange={handleChange}
+    placeholder="Ej: Matias"
+  />
+</div>
+<div className="col-md-3">
+  <label htmlFor="apellido" className="form-label dark-mode">Apellido</label>
+  <input
+    type="text"
+    className="form-control"
+    id="apellido"
+    value={formDataTrabajador.apellido}
+    onChange={handleChange}
+    placeholder="Ej: Martinez"
+  />
+</div>
+<div className="col-md-3">
+  <label htmlFor="telefono" className="form-label dark-mode">Teléfono</label>
+  <input
+    type="tel"
+    className="form-control"
+    id="telefono"
+    value={formDataTrabajador.telefono}
+    onChange={handleChange}
+    placeholder="Ej: 11567812123"
+  />
+</div>
+<div className="col-md-3">
+  <label htmlFor="telefono2" className="form-label dark-mode">Teléfono 2</label>
+  <input
+    type="tel"
+    className="form-control"
+    id="telefono2"
+    value={formDataTrabajador.telefono2}
+    onChange={handleChange}
+    placeholder="Ej: 1167894222"
+  />
+</div>
+<div className="col-md-4">
+  <label htmlFor="email" className="form-label dark-mode">Email</label>
+  <input
+    type="email"
+    className="form-control"
+    id="email"
+    value={formDataTrabajador.email}
+    onChange={handleChange}
+    placeholder="Ej: matias@email.com"
+  />
+</div>
+<div className="col-md-4">
+  <label htmlFor="calle" className="form-label dark-mode">Calle</label>
+  <input
+    type="text"
+    className="form-control"
+    id="calle"
+    value={formDataTrabajador.calle}
+    onChange={handleChange}
+    placeholder="Ej: Av. Republica"
+  />
+</div>
+<div className="col-md-2">
+  <label htmlFor="numero" className="form-label dark-mode">Número</label>
+  <input
+    type="number"
+    className="form-control"
+    id="numero"
+    value={formDataTrabajador.numero}
+    onChange={handleChange}
+    placeholder="Ej: 989"
+  />
+</div>
+<div className="col-md-2">
+  <label htmlFor="piso" className="form-label dark-mode">Piso</label>
+  <input
+    type="text"
+    className="form-control"
+    id="piso"
+    value={formDataTrabajador.piso}
+    onChange={handleChange}
+    placeholder="Ej: 4"
+  />
+</div>
+<div className="col-md-2">
+  <label htmlFor="depto" className="form-label dark-mode">Depto</label>
+  <input
+    type="text"
+    className="form-control"
+    id="depto"
+    value={formDataTrabajador.depto}
+    onChange={handleChange}
+    placeholder="Ej: C"
+  />
+</div>
+<div className="col-md-2">
+  <label htmlFor="cp" className="form-label dark-mode">Código Postal</label>
+  <input
+    type="number"
+    className="form-control"
+    id="cp"
+    value={formDataTrabajador.cp}
+    onChange={handleChange}
+    placeholder="Ej: 8000"
+  />
+</div>
+<div className="col-md-3">
+  <label htmlFor="localidad" className="form-label dark-mode">Localidad</label>
+  <input
+    type="text"
+    className="form-control"
+    id="localidad"
+    value={formDataTrabajador.localidad}
+    onChange={handleChange}
+    placeholder="Ej: Bahía Blanca"
+  />
+</div>
+<div className="col-md-3">
+  <label htmlFor="provincia" className="form-label dark-mode">Provincia</label>
+  <input
+    type="text"
+    className="form-control"
+    id="provincia"
+    value={formDataTrabajador.provincia}
+    onChange={handleChange}
+    placeholder="Ej: Buenos Aires"
+  />
+</div>
+
+
+
+   {/* ESPACION */}
+
           <hr />
           <h4 className="my-3 text-warning ">Lugar y descripción del hecho</h4>
           <div className="col-md-4">

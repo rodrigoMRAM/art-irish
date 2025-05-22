@@ -115,6 +115,7 @@ export const ListarSiniestros = () => {
                       <li>
                         <button className="dropdown-item">
                           <b>Ver Siniestro</b>
+                          onClick={() => handleEdit(data.idStro)}
                         </button>
                       </li>
                       <li>
