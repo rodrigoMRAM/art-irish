@@ -62,7 +62,7 @@ export const ListaUsuarios = () => {
   };
 
   return (
-    <main className="mt-5 px-5">
+    <main className="mt-5 px-5 overflow-y-auto">
       {/* Aquí puedes eliminar el mensaje success ya que toast lo reemplaza */}
       {/* {success && (
         <div className="text-center">

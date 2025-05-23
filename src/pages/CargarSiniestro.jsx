@@ -6,6 +6,8 @@ import {
   useUpdateSiniestro,
   useAssignAnalista,
 } from '../hooks/useSiniestro'; // ajusta el path según tu estructura
+import { ToastContainer, toast } from 'react-toastify';
+import { useTheme } from "../utils/ThemeState";
 
 import { useArts, useDeleteArt, useUpdateArt } from "../hooks/useGetArt";
 import { useCreateTrabajador } from "../hooks/useCreateTrabajador";
@@ -28,26 +30,14 @@ const initialFormData = {
 
 export const CargarSiniestro = () => {
   const { data: arts = [], isLoading, error : errorart } = useArts();
-  const {
-    mutate: createTrabajador,
-    isLoading: loadingTrabajador,
-    data: trabajadorCreado,
-    isSuccess: successTrabajador,
-    error: errorTrabajador,
-  } = useCreateTrabajador();
-  const {
-    siniestros,
-    loading,
-    error,
-    success,
-    deleteSiniestro,
-    crearSiniestro,
-  } = useSiniestros();
+  const { mutateAsync: crearSiniestro, isLoading: loading , error, success} = useCrearSiniestro();
+  const { theme } = useTheme();
+ 
   const [formData, setFormData] = useState({
     numStro: "",
     fechaYHoraStro: "",
     tipoInvestigacion: "",
-    idart :"",
+
     lugar_direccion: "",
     lugar_entrecalles: "",
     localidad: "",
@@ -72,18 +62,21 @@ export const CargarSiniestro = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    crearSiniestro(formData);
-  };
 
-  useEffect(() => {
-    if (success) {
-      setFormData({
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+  console.log(formData)
+  crearSiniestro(
+    { formData },
+    {
+      onSuccess: () => {
+        toast.success('Siniestro creado correctamente');
+        setFormData({
         numStro: "",
         fechaYHoraStro: "",
         tipoInvestigacion: "",
-        idart :"",
+     
         lugar_direccion: "",
         lugar_entrecalles: "",
         localidad: "",
@@ -98,8 +91,14 @@ export const CargarSiniestro = () => {
         tieneRecupero: true,
         observaciones: "",
       });
+      },
+      onError: () => {
+        toast.error('Error al crear el siniestro');
+      },
     }
-  }, [success]);
+  );
+};
+
 
   return (
     <main className="mt-5 p-5 col-lg-9 m-auto">
@@ -113,7 +112,7 @@ export const CargarSiniestro = () => {
         <form className="row g-3" onSubmit={handleSubmit}>
           <div className="col-md-4">
             <label htmlFor="numStro" className="form-label dark-mode">
-              Ingrese número de Stro.
+              Número de Stro.
             </label>
             <input
               type="number"
@@ -126,7 +125,7 @@ export const CargarSiniestro = () => {
           </div>
           <div className="col-md-4 mb-3">
             <label htmlFor="fechaYHoraStro" className="form-label dark-mode">
-              Ingrese fecha y Hora
+              Fecha y hora de siniestro
             </label>
             <input
               type="datetime-local"
@@ -140,7 +139,7 @@ export const CargarSiniestro = () => {
   <label htmlFor="tipoInvestigacion" className="form-label dark-mode">
     Cliente
   </label>
-  <select
+ <select
     id="idart"
     className="form-select"
     value={formData.idart}
@@ -150,15 +149,18 @@ export const CargarSiniestro = () => {
     <option value="">Seleccione</option>
 
     {arts.map((art) => (
-      <option key={art.id} value={art.id}>
+      <option key={art.idart} value={art.idart}>
         {art.nombreART}
       </option>
     ))}
   </select>
+
+
+
 </div>
    {/* ESPACION */}
  <hr />
-          <h4 className="my-3 text-warning ">Trabajador</h4>
+          <h4 className="my-3 text-warning ">Datos del trabajador</h4>
           <div className="col-md-3">
   <label htmlFor="dni" className="form-label dark-mode">DNI</label>
   <input
@@ -204,7 +206,7 @@ export const CargarSiniestro = () => {
   />
 </div>
 <div className="col-md-3">
-  <label htmlFor="telefono2" className="form-label dark-mode">Teléfono 2</label>
+  <label htmlFor="telefono2" className="form-label dark-mode">Teléfono 2 (opcional)</label>
   <input
     type="tel"
     className="form-control"
@@ -227,6 +229,17 @@ export const CargarSiniestro = () => {
 </div>
 <div className="col-md-4">
   <label htmlFor="calle" className="form-label dark-mode">Calle</label>
+  <input
+    type="text"
+    className="form-control"
+    id="calle"
+    value={formDataTrabajador.calle}
+    onChange={handleChange}
+    placeholder="Ej: Av. Republica"
+  />
+</div>
+<div className="col-md-4">
+  <label htmlFor="calle" className="form-label dark-mode">Entre calles</label>
   <input
     type="text"
     className="form-control"
@@ -302,6 +315,7 @@ export const CargarSiniestro = () => {
     placeholder="Ej: Buenos Aires"
   />
 </div>
+
 
 
 
@@ -480,7 +494,7 @@ export const CargarSiniestro = () => {
               placeholder="Ingrese el tipo de Siniestro"
             />
           </div>
-          <div className="col-md-7">
+          {/* <div className="col-md-7">
             <label htmlFor="resultado" className="form-label dark-mode">
               Resultado
             </label>
@@ -492,8 +506,8 @@ export const CargarSiniestro = () => {
               onChange={handleChange}
               placeholder="Ingrese el resultado"
             />
-          </div>
-          <div className="form-check form-switch col-md-4 mx-2">
+          </div> */}
+          {/* <div className="form-check form-switch col-md-4 mx-2">
             <input
               className="form-check-input"
               type="checkbox"
@@ -508,7 +522,7 @@ export const CargarSiniestro = () => {
             >
               Tiene Recupero
             </label>
-          </div>
+          </div> */}
           <hr />
           <h4 className="text-warning">Observaciones</h4>
           <div className="mb-3">
@@ -538,6 +552,17 @@ export const CargarSiniestro = () => {
           )}
         </form>
       </div>
+      <ToastContainer
+               position="bottom-right"
+               autoClose={1500}
+               hideProgressBar={false}
+               newestOnTop={false}
+               closeOnClick
+               pauseOnFocusLoss
+               draggable
+               pauseOnHover
+               theme={theme === "dark" ? "dark" : "light"}
+             />
     </main>
   );
 };

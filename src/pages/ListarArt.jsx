@@ -79,7 +79,7 @@ export const ListarArt = () => {
   if (error) return <p>Error al cargar arts</p>;
 
   return (
-    <main className="mt-5 px-5">
+    <main className="mt-5 px-5 overflow-y-auto">
         <div className="d-flex justify-content-between align-items-center pt-5">
         <h2>Lista de Clientes</h2>
         <button

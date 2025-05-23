@@ -68,7 +68,7 @@ const handleDelete = (idStro) => {
   };
 
   return (
-    <main className="mt-5 px-5">
+    <main className="mt-5 px-5 overflow-y-auto">
       <div className="d-flex justify-content-between align-items-center pt-5">
         <h2 className="">Lista de Siniestros</h2>
         <button

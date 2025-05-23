@@ -15,14 +15,14 @@ const fetchSiniestros = async (token) => {
 };
 
 // Crear siniestro
-const crearSiniestro = async ({ payload, token }) => {
+const crearSiniestro = async ({ formData, token }) => {
   const res = await fetch(`${API_URL}/siniestros`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(formData),
   });
   if (!res.ok) throw new Error('Error al crear el siniestro');
   return res.json();
@@ -84,7 +84,7 @@ export const useCrearSiniestro = () => {
   const token = useSelector((state) => state.user.jwt);
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ payload }) => crearSiniestro({ payload, token }),
+    mutationFn: ({ formData }) => crearSiniestro({ formData, token }),
     onSuccess: () => {
       queryClient.invalidateQueries(['siniestros']);
     },
