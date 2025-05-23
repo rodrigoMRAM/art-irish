@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import useSiniestros from "../hooks/useSiniestro";
+import {
+  useSiniestros,
+  useCrearSiniestro,
+  useDeleteSiniestro,
+  useUpdateSiniestro,
+  useAssignAnalista,
+} from '../hooks/useSiniestro'; // ajusta el path según tu estructura
+
 import { useArts, useDeleteArt, useUpdateArt } from "../hooks/useGetArt";
 import { useCreateTrabajador } from "../hooks/useCreateTrabajador";
 

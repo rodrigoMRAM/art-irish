@@ -92,9 +92,8 @@ export const ListarAuditor = () => {
       <table className="table table-striped">
         <thead className="table-dark">
           <tr>
-            <th>Apellido</th>
             <th>DNI</th>
-            <th>Nombre</th>
+            <th>Nombre y apellido</th>
             <th>CP</th>
             <th>Domicilio</th>
             <th>Localidad</th>
@@ -104,9 +103,8 @@ export const ListarAuditor = () => {
         <tbody>
           {auditores.map((auditor) => (
             <tr key={auditor.id}>
-              <td>{auditor.apellido}</td>
               <td>{auditor.dni}</td>
-              <td>{auditor.nombre}</td>
+              <td>{auditor.nombre+ ' '+ auditor.apellido}</td>
               <td>{auditor.cp}</td>
               <td>{auditor.domicilio}</td>
               <td>{auditor.localidad}</td>

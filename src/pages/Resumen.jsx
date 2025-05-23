@@ -21,7 +21,7 @@ export const Resumen = () => {
     <h5 className="card-title">Resumen</h5>
     </div>
 <div className='d-flex justify-content-between'>
-    <p><strong className='text-warning'>Número de siniestro:</strong> {formData.idStro}</p>
+    <p><strong className='text-warning'>Número de siniestro:</strong> {formData.numStro}</p>
     <div className='d-flex flex-column text-end'>
 
 <p><strong className='text-warning'>Fecha:</strong> {formData.fechaYHoraStro}</p>

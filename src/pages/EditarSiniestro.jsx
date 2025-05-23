@@ -1,12 +1,27 @@
 import React, { useState, useEffect, use } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import useSiniestros from "../hooks/useSiniestro";
+import {
+  useSiniestros,
+  useCrearSiniestro,
+  useDeleteSiniestro,
+  useUpdateSiniestro,
+  useAssignAnalista,
+} from '../hooks/useSiniestro'; 
 
 export const EditarSiniestro = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState(location.state?.formData || {});
-  const { siniestros, loading, error, updateSiniestros } = useSiniestros();
+  const [formData, setFormData] = useState(() => {
+  const stateData = location.state?.formData || {};
+  return {
+    ...stateData,
+    analista: stateData.analista ?? null, 
+  };
+});
+
+
+  const updateMutation = useUpdateSiniestro();
+  const deleteMutation = useDeleteSiniestro();
   useEffect(() => {
     if (location.state?.formData) {
       setFormData(location.state.formData);
@@ -20,16 +35,23 @@ export const EditarSiniestro = () => {
       [id]: type === "checkbox" ? checked : value,
     });
   };
-
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await updateSiniestros(formData.idStro, formData); // Esperamos a que termine la actualización
-      navigate("/siniestros/listar"); // Navegamos solo cuando la actualización se haya completado correctamente
-    } catch (error) {
-      console.error("Error al actualizar el siniestro:", error);
-    }
-  };
+  e.preventDefault();
+  try {
+    await updateMutation.mutateAsync({
+      idStro: formData.idStro,
+      updatedData: {
+        ...formData,
+      },
+    });
+
+    navigate("/siniestros/listar");
+  } catch (error) {
+    console.error("Error al actualizar el siniestro:", error);
+  }
+};
+
+
 
   return (
     <main className="mt-5 p-5 col-lg-9 m-auto">

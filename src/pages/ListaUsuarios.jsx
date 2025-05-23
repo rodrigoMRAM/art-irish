@@ -88,8 +88,7 @@ export const ListaUsuarios = () => {
         >
           <tr>
             <th>DNI</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
+            <th>Nombre y apellido</th>
             <th>Email</th>
             <th>Rol</th>
             <th></th>
@@ -99,8 +98,7 @@ export const ListaUsuarios = () => {
           {usuarios.map((usuario) => (
             <tr key={usuario.id}>
               <td>{usuario.dni}</td>
-              <td>{usuario.nombre}</td>
-              <td>{usuario.apellido}</td>
+              <td>{usuario.nombre+' '+ usuario.apellido}</td>
               <td>{usuario.email}</td>
               <td>{usuario.rol}</td>
               <td>
