@@ -1,5 +1,6 @@
 import React from 'react'
 import { useLocation } from 'react-router-dom';
+import formatDate from '../utils/formatDate';
 
 export const Resumen = () => {
    const location = useLocation();
@@ -24,7 +25,7 @@ export const Resumen = () => {
     <p><strong className='text-warning'>Número de siniestro:</strong> {formData.numStro}</p>
     <div className='d-flex flex-column text-end'>
 
-<p><strong className='text-warning'>Fecha:</strong> {formData.fechaYHoraStro}</p>
+<p><strong className='text-warning'>Fecha:</strong> {formatDate(formData.fechaYHoraStro) }</p>
 <p><strong className='text-warning'>Cliente:</strong> {formData.art?.nombreART}</p>
     </div>
 </div>
@@ -33,24 +34,24 @@ export const Resumen = () => {
 <div className='d-flex justify-content-between flex-wrap'>
 <div>
 
-<p><strong className='text-warning'>DNI:</strong> [DNI]</p>
-<p><strong className='text-warning'>Nombre y Apellido:</strong> [Nombre Apellido]</p>
-<p><strong className='text-warning'>Teléfono 1:</strong> [Teléfono]</p>
-<p><strong className='text-warning'>Teléfono 2:</strong> [Teléfono 2]</p>
+<p><strong className='text-warning'>DNI:</strong>  {formData.trabajador?.dni}</p>
+<p><strong className='text-warning'>Nombre y Apellido:</strong> {formData.trabajador?.nombre} {formData.trabajador?.apellido}</p>
+<p><strong className='text-warning'>Teléfono 1:</strong> {formData.trabajador?.telefono}</p>
+<p><strong className='text-warning'>Teléfono 2:</strong>{formData.trabajador?.telefono2}</p>
 </div>
 <div>
 
-<p><strong className='text-warning'>Email:</strong> [Email]</p>
-<p><strong className='text-warning'>Calle:</strong> [Calle]</p>
-<p><strong className='text-warning'>Número:</strong> [Número]</p>
-<p><strong className='text-warning'>Piso:</strong> [Piso]</p>
+<p><strong className='text-warning'>Email:</strong> {formData.trabajador?.email}</p>
+<p><strong className='text-warning'>Calle:</strong> {formData.trabajador?.calle}</p>
+<p><strong className='text-warning'>Número:</strong> {formData.trabajador?.numero}</p>
+<p><strong className='text-warning'>Piso:</strong> {formData.trabajador?.piso}</p>
 </div>
 <div>
 
-<p><strong className='text-warning'>Departamento:</strong> [Depto]</p>
-<p><strong className='text-warning'>Código Postal:</strong> [Código Postal]</p>
-<p><strong className='text-warning'>Localidad:</strong> [Localidad]</p>
-<p><strong className='text-warning'>Provincia:</strong> [Provincia]</p>
+<p><strong className='text-warning'>Departamento:</strong> {formData.trabajador?.depto}</p>
+<p><strong className='text-warning'>Código Postal:</strong> {formData.trabajador?.cp}</p>
+<p><strong className='text-warning'>Localidad:</strong> {formData.trabajador?.localidad}</p>
+<p><strong className='text-warning'>Provincia:</strong> {formData.trabajador?.provincia}</p>
 </div>
 </div>
 <h2 className='mt-4'>Lugar del hecho</h2>

@@ -6,16 +6,17 @@ import {
   useDeleteSiniestro,
   useUpdateSiniestro,
   useAssignAnalista,
-} from '../hooks/useSiniestro'; 
+} from "../hooks/useSiniestro";
 import useListaUsuarios from "../hooks/useListaUsuarios";
 import { useNavigate } from "react-router-dom";
+import formatDate from '../utils/formatDate';
 import DeleteIcon from "../assets/icons/delete.svg?react";
 
 export const ListarSiniestros = () => {
   const { data: siniestros = [], isLoading, error } = useSiniestros();
   const deleteMutation = useDeleteSiniestro();
   const assignAnalista = useAssignAnalista();
-  console.log(siniestros)
+  console.log(siniestros);
   const { usuarios: analistas } = useListaUsuarios();
   const { theme } = useTheme();
   const navigate = useNavigate();
@@ -27,36 +28,24 @@ export const ListarSiniestros = () => {
     setShowModal(true);
   };
 
-
-const handleDelete = (idStro) => {
-
-  deleteMutation.mutate(
-    { idStro: idStro },
-    {
-      onSuccess: () => {
-        setShowModal(false);
-        toast.success('Eliminado correctamente');
-      },
-      onError: () => {
-        toast.error('Error al eliminar');
-      },
-    }
-  );
-};
-
+  const handleDelete = (idStro) => {
+    deleteMutation.mutate(
+      { idStro: idStro },
+      {
+        onSuccess: () => {
+          setShowModal(false);
+          toast.success("Eliminado correctamente");
+        },
+        onError: () => {
+          toast.error("Error al eliminar");
+        },
+      }
+    );
+  };
 
   const handleSelectAnalista = (idStro, value) => {
     assignAnalista.mutate({ idStro, analistaId: value || null });
   };
-
-  const formatDate = (d) =>
-    new Date(d).toLocaleString(undefined, {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
 
   const handleSummary = (siniestro) => {
     navigate("/resumen", { state: { formData: siniestro } });
@@ -64,7 +53,6 @@ const handleDelete = (idStro) => {
 
   const handleEdit = (siniestro) => {
     navigate("/siniestros/editar", { state: { formData: siniestro } });
-
   };
 
   return (
@@ -140,9 +128,11 @@ const handleDelete = (idStro) => {
                       aria-labelledby={`dropdownMenuButton-${data.idStro}`}
                     >
                       <li>
-                        <button className="dropdown-item" onClick={() => handleSummary(data)}>
+                        <button
+                          className="dropdown-item"
+                          onClick={() => handleSummary(data)}
+                        >
                           <b>Ver Siniestro</b>
-                          
                         </button>
                       </li>
                       <li>

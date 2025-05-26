@@ -30,8 +30,9 @@ const initialFormData = {
 
 export const CargarSiniestro = () => {
   const { data: arts = [], isLoading, error : errorart } = useArts();
-  const { mutateAsync: crearSiniestro, isLoading: loading , error, success} = useCrearSiniestro();
   const { mutateAsync: createTrabajador } = useCreateTrabajador();
+  const { mutateAsync: crearSiniestro, isLoading: loading , error, success} = useCrearSiniestro();
+  
 
   const { theme } = useTheme();
   const [formData, setFormData] = useState({
@@ -51,6 +52,8 @@ export const CargarSiniestro = () => {
     resultado: "",
     tieneRecupero: true,
     observaciones: "",
+    artId: null,
+    trabajadorId: "",
   });
 
   const [formDataTrabajador, setFormDataTrabajador] = useState(initialFormData);
@@ -78,7 +81,7 @@ const handleSubmit = (e) => {
       const payload = {
         formData: {
           ...formData,
-          trabajador: {id : idTrabajador} ,
+          trabajadorId:  idTrabajador, // Asignar el ID del trabajador creado,
         }
       };
 
@@ -104,6 +107,8 @@ const handleSubmit = (e) => {
             resultado: "",
             tieneRecupero: true,
             observaciones: "",
+            artId: null,
+            trabajadorId: "",
             aseguradoId: "",  
           });
         },
@@ -124,9 +129,7 @@ const handleSubmit = (e) => {
   return (
     <main className="mt-5 p-5 col-lg-9 m-auto">
       <div>
-        {/* <div className="text-center">
-          <p className="alert alert-info">Siniestro cargado Exitosamente!!</p>
-        </div> */}
+        
         <h2 className="my-3">Cargar nuevo Siniestro</h2>
 
         <p className="mb-0 text-danger"></p>
@@ -160,12 +163,12 @@ const handleSubmit = (e) => {
   <label htmlFor="tipoInvestigacion" className="form-label dark-mode">
     Cliente
   </label>
- {/* <select
-    id="idart"
+  <select
+    id="artId"
     className="form-select"
-    value={formData.idart}
+    value={formData.artId}
     onChange={handleChange}
-    name="idart"
+    name="artId"
   >
     <option value="">Seleccione</option>
 
@@ -174,7 +177,7 @@ const handleSubmit = (e) => {
         {art.nombreART}
       </option>
     ))}
-  </select> */}
+  </select> 
 
 
 
