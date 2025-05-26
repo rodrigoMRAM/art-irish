@@ -76,7 +76,7 @@ export const ListarSiniestros = () => {
                 <td>{data.numStro}</td>
                 <td className="fecha">{formatDate(data.fechaIngreso)}</td>
                 <td className="fecha">{formatDate(data.fecha_vencimiento)}</td>
-                <td>ART ?</td>
+                <td>{data.art?.nombreART}</td>
                 <td>{data.lugar_direccion}</td>
                 <td>{data.localidad}</td>
                 <td>

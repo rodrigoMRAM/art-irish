@@ -1,5 +1,6 @@
 body{
   height: 100vh;
+  font-family: "Noto Sans", sans-serif !important;
 }
 #root{
   height: 100%;
