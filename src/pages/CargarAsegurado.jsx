@@ -73,35 +73,42 @@ const [form, setForm] = useState(initialFormState);
         <div className="d-flex gap-3">
           <div className="form-floating mb-3 col-md-6">
             <input type="text" className="form-control" id="nombre" onChange={handleChange} required />
-            <label htmlFor="nombre">Ingrese nombre</label>
+            <label htmlFor="nombre">Nombre</label>
           </div>
           <div className="form-floating mb-3 col-md-6">
             <input type="text" className="form-control" id="cuit" onChange={handleChange} required />
-            <label htmlFor="cuit">Ingrese CUIT</label>
+            <label htmlFor="cuit">CUIT</label>
           </div>
         </div>
         <div className="d-flex gap-3">
           <div className="form-floating mb-3 col-md-6">
             <input type="tel" className="form-control" id="telefono" onChange={handleChange} required />
-            <label htmlFor="telefono">Ingrese teléfono</label>
+            <label htmlFor="telefono">Teléfono</label>
           </div>
           <div className="form-floating mb-3 col-md-6">
             <input type="tel" className="form-control" id="telefono2" onChange={handleChange} />
-            <label htmlFor="telefono2">Ingrese teléfono (opcional)</label>
+            <label htmlFor="telefono2">Teléfono (opcional)</label>
           </div>
         </div>
         <div className="form-floating mb-3">
           <input type="email" className="form-control" id="email" onChange={handleChange} required />
-          <label htmlFor="email">Ingrese e-mail</label>
+          <label htmlFor="email">E-mail</label>
         </div>
         <div className="form-floating mb-3">
           <input type="text" className="form-control" id="empresa" onChange={handleChange} required />
-          <label htmlFor="empresa">Ingrese empresa</label>
+          <label htmlFor="empresa">Razón social</label>
+        </div>
+        <div className="form-floating mb-3">
+          <input type="text" className="form-control" id="empresa" onChange={handleChange} required />
+          <label htmlFor="empresa">Nombre de fantasía</label>
         </div>
         <div className="form-floating mb-3">
           <input type="text" className="form-control" id="prestadorMedico" onChange={handleChange} required />
           <label htmlFor="prestadorMedico">Ingrese prestador médico</label>
         </div>
+        <button className="btn btn-warning float-end" type="submit" >
+         Agregar 
+        </button>
 
         <h5 className="mt-4">Contacto del Asegurado</h5>
         <div className="form-floating mb-3">

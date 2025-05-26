@@ -78,7 +78,7 @@ export const ListarAuditor = () => {
   if (error) return <p>Error al cargar auditores</p>;
 
   return (
-    <main className="mt-5 px-5">
+    <main className="mt-5 px-5 overflow-y-auto">
       <div className="d-flex justify-content-between align-items-center pt-5">
         <h2>Lista de Auditores</h2>
         <button
@@ -92,9 +92,8 @@ export const ListarAuditor = () => {
       <table className="table table-striped">
         <thead className="table-dark">
           <tr>
-            <th>Apellido</th>
             <th>DNI</th>
-            <th>Nombre</th>
+            <th>Nombre y apellido</th>
             <th>CP</th>
             <th>Domicilio</th>
             <th>Localidad</th>
@@ -104,9 +103,8 @@ export const ListarAuditor = () => {
         <tbody>
           {auditores.map((auditor) => (
             <tr key={auditor.id}>
-              <td>{auditor.apellido}</td>
               <td>{auditor.dni}</td>
-              <td>{auditor.nombre}</td>
+              <td>{auditor.nombre+ ' '+ auditor.apellido}</td>
               <td>{auditor.cp}</td>
               <td>{auditor.domicilio}</td>
               <td>{auditor.localidad}</td>

@@ -1,30 +1,52 @@
 import React, { useState } from "react";
 import { useTheme } from "../utils/ThemeState";
-import useSiniestros from "../hooks/useSiniestro";
+import {
+  useSiniestros,
+  useCrearSiniestro,
+  useDeleteSiniestro,
+  useUpdateSiniestro,
+  useAssignAnalista,
+} from '../hooks/useSiniestro'; 
 import useListaUsuarios from "../hooks/useListaUsuarios";
 import { useNavigate } from "react-router-dom";
 import DeleteIcon from "../assets/icons/delete.svg?react";
 
 export const ListarSiniestros = () => {
-  const { siniestros, deleteSiniestro, assignAnalista } = useSiniestros();
+  const { data: siniestros = [], isLoading, error } = useSiniestros();
+  const deleteMutation = useDeleteSiniestro();
+  const assignAnalista = useAssignAnalista();
+  console.log(siniestros)
   const { usuarios: analistas } = useListaUsuarios();
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const [showModal, setShowModal] = React.useState(false);
-  const [selectedSiniestro, setSelectedSiniestro] = React.useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSiniestro, setSelectedSiniestro] = useState(null);
 
   const handleShowModal = (s) => {
     setSelectedSiniestro(s);
     setShowModal(true);
   };
-  const handleDelete = (id) => {
-    deleteSiniestro(id);
-    setShowModal(false);
-  };
+
+
+const handleDelete = (idStro) => {
+
+  deleteMutation.mutate(
+    { idStro: idStro },
+    {
+      onSuccess: () => {
+        setShowModal(false);
+        toast.success('Eliminado correctamente');
+      },
+      onError: () => {
+        toast.error('Error al eliminar');
+      },
+    }
+  );
+};
+
 
   const handleSelectAnalista = (idStro, value) => {
-    // value = "" o UUID string
-    assignAnalista(idStro, value || null);
+    assignAnalista.mutate({ idStro, analistaId: value || null });
   };
 
   const formatDate = (d) =>
@@ -36,12 +58,17 @@ export const ListarSiniestros = () => {
       minute: "2-digit",
     });
 
-  const handleEdit = (siniestro) => {
+  const handleSummary = (siniestro) => {
     navigate("/resumen", { state: { formData: siniestro } });
   };
 
+  const handleEdit = (siniestro) => {
+    navigate("/siniestros/editar", { state: { formData: siniestro } });
+
+  };
+
   return (
-    <main className="mt-5 px-5">
+    <main className="mt-5 px-5 overflow-y-auto">
       <div className="d-flex justify-content-between align-items-center pt-5">
         <h2 className="">Lista de Siniestros</h2>
         <button
@@ -52,7 +79,7 @@ export const ListarSiniestros = () => {
         </button>
       </div>
       <br />
-      <div class="table-responsive">
+      <div className="table-responsive">
         <table className="table table-striped table-hover no-wrap">
           <thead
             className={`${
@@ -113,7 +140,7 @@ export const ListarSiniestros = () => {
                       aria-labelledby={`dropdownMenuButton-${data.idStro}`}
                     >
                       <li>
-                        <button className="dropdown-item" onClick={() => handleEdit(data)}>
+                        <button className="dropdown-item" onClick={() => handleSummary(data)}>
                           <b>Ver Siniestro</b>
                           
                         </button>
