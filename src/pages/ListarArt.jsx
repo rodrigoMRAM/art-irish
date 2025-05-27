@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useArts, useDeleteArt, useUpdateArt } from "../hooks/useGetArt"; // Ajustá path
 import { ToastContainer, toast } from 'react-toastify';
 import { useTheme } from "../utils/ThemeState";
-import DeleteIcon from "../assets/icons/delete.svg?react";
 export const ListarArt = () => {
   const { data: arts = [], isLoading, error } = useArts();
   
@@ -92,10 +91,10 @@ export const ListarArt = () => {
      <div className="row">
   {arts.map((art) => (
     <div className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4" key={art.idART}>
-      <div className="card h-100 border-0">
+      <div className="card h-100 border-1 shadow">
         <div
           className="d-flex flex-column h-100"
-          style={{ backgroundColor: '#18181B', borderRadius: '10px' }}
+          
         >
           <div className="p-3">
             <h5 className="card-title">{art.nombreART}</h5>
