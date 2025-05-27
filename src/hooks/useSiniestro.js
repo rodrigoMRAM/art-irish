@@ -14,6 +14,9 @@ const fetchSiniestros = async (token) => {
   return res.json();
 };
 
+
+
+
 // Crear siniestro
 const crearSiniestro = async ({ formData, token }) => {
   const res = await fetch(`${API_URL}/siniestros`, {
@@ -84,7 +87,9 @@ export const useCrearSiniestro = () => {
   const token = useSelector((state) => state.user.jwt);
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ formData }) => crearSiniestro({ formData, token }),
+    mutationFn: ({ formData }) => {
+      return crearSiniestro({ formData, token });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['siniestros']);
     },

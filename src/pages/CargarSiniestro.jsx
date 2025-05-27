@@ -31,13 +31,13 @@ const initialFormData = {
 export const CargarSiniestro = () => {
   const { data: arts = [], isLoading, error : errorart } = useArts();
   const { mutateAsync: crearSiniestro, isLoading: loading , error, success} = useCrearSiniestro();
+  const { mutateAsync: createTrabajador } = useCreateTrabajador();
+
   const { theme } = useTheme();
- 
   const [formData, setFormData] = useState({
     numStro: "",
     fechaYHoraStro: "",
     tipoInvestigacion: "",
-
     lugar_direccion: "",
     lugar_entrecalles: "",
     localidad: "",
@@ -60,44 +60,65 @@ export const CargarSiniestro = () => {
       ...formData,
       [id]: type === "checkbox" ? checked : value,
     });
+    setFormDataTrabajador({
+      ...formDataTrabajador,
+      [id]: type === "checkbox" ? checked : value,
+    });
   };
 
-
-
+// console.log(formData)
 const handleSubmit = (e) => {
   e.preventDefault();
-  console.log(formData)
-  crearSiniestro(
-    { formData },
-    {
-      onSuccess: () => {
-        toast.success('Siniestro creado correctamente');
-        setFormData({
-        numStro: "",
-        fechaYHoraStro: "",
-        tipoInvestigacion: "",
-     
-        lugar_direccion: "",
-        lugar_entrecalles: "",
-        localidad: "",
-        provincia: "",
-        mechanicaHecho: "",
-        gravedad: "",
-        nombrePrestadorMedico: "",
-        lesiones: "",
-        patologiasInculpables: "",
-        tipoStro: "",
-        resultado: "",
-        tieneRecupero: true,
-        observaciones: "",
+
+  createTrabajador(formDataTrabajador, {
+    onSuccess: (trabajadorCreado) => {
+      const idTrabajador = trabajadorCreado.id;
+      console.log("ID Trabajador:", idTrabajador);
+
+      const payload = {
+        formData: {
+          ...formData,
+          trabajador: {id : idTrabajador} ,
+        }
+      };
+
+      console.log("Payload a enviar:", payload);
+
+      crearSiniestro(payload, {
+        onSuccess: () => {
+          toast.success('Siniestro creado correctamente');
+          setFormData({
+            numStro: "",
+            fechaYHoraStro: "",
+            tipoInvestigacion: "",
+            lugar_direccion: "",
+            lugar_entrecalles: "",
+            localidad: "",
+            provincia: "",
+            mechanicaHecho: "",
+            gravedad: "",
+            nombrePrestadorMedico: "",
+            lesiones: "",
+            patologiasInculpables: "",
+            tipoStro: "",
+            resultado: "",
+            tieneRecupero: true,
+            observaciones: "",
+            aseguradoId: "",  
+          });
+        },
+        onError: () => {
+          toast.error('Error al crear el siniestro');
+        }
       });
-      },
-      onError: () => {
-        toast.error('Error al crear el siniestro');
-      },
+    },
+    onError: () => {
+      toast.error('Error al crear el trabajador');
     }
-  );
+  });
 };
+
+
 
 
   return (
@@ -139,7 +160,7 @@ const handleSubmit = (e) => {
   <label htmlFor="tipoInvestigacion" className="form-label dark-mode">
     Cliente
   </label>
- <select
+ {/* <select
     id="idart"
     className="form-select"
     value={formData.idart}
@@ -149,11 +170,11 @@ const handleSubmit = (e) => {
     <option value="">Seleccione</option>
 
     {arts.map((art) => (
-      <option key={art.idart} value={art.idart}>
+      <option key={art.idART} value={art.idART}>
         {art.nombreART}
       </option>
     ))}
-  </select>
+  </select> */}
 
 
 
@@ -238,7 +259,7 @@ const handleSubmit = (e) => {
     placeholder="Ej: Av. Republica"
   />
 </div>
-<div className="col-md-4">
+{/* <div className="col-md-4">
   <label htmlFor="calle" className="form-label dark-mode">Entre calles</label>
   <input
     type="text"
@@ -248,7 +269,7 @@ const handleSubmit = (e) => {
     onChange={handleChange}
     placeholder="Ej: Av. Republica"
   />
-</div>
+</div> */}
 <div className="col-md-2">
   <label htmlFor="numero" className="form-label dark-mode">Número</label>
   <input
@@ -309,7 +330,7 @@ const handleSubmit = (e) => {
   <input
     type="text"
     className="form-control"
-    id="provincia"
+    id="provincia1"
     value={formDataTrabajador.provincia}
     onChange={handleChange}
     placeholder="Ej: Buenos Aires"

@@ -15,7 +15,7 @@ export const ListarSiniestros = () => {
   const { data: siniestros = [], isLoading, error } = useSiniestros();
   const deleteMutation = useDeleteSiniestro();
   const assignAnalista = useAssignAnalista();
-
+  console.log(siniestros)
   const { usuarios: analistas } = useListaUsuarios();
   const { theme } = useTheme();
   const navigate = useNavigate();
@@ -79,7 +79,7 @@ const handleDelete = (idStro) => {
         </button>
       </div>
       <br />
-      <div class="table-responsive">
+      <div className="table-responsive">
         <table className="table table-striped table-hover no-wrap">
           <thead
             className={`${
