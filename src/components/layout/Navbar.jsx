@@ -139,11 +139,11 @@ export const Navbar = () => {
               </ul>
             </li>
 
-            <li className="nav-item">
+           {user.rol === "ADMINISTRADOR" && <li className="nav-item">
               <Link className="nav-link active" to={"/registro"}>
                 Nuevo Usuario
               </Link>
-            </li>
+            </li>}
           </ul>
 
           <div className="navbar-nav mb-2 mb-sm-0">
