@@ -11,13 +11,13 @@ import useListaUsuarios from "../hooks/useListaUsuarios";
 import { useNavigate } from "react-router-dom";
 import formatDate from "../utils/formatDate";
 import { toast } from "react-toastify";
-import { useArts } from "../hooks/useGetArt"; 
+import { useArts } from "../hooks/useGetArt";
 
 export const ListarSiniestros = () => {
   // -------------------------------
   // 1. Estado para el filtro de ART y Analista
   // -------------------------------
-  const [selectedArtId, setSelectedArtId] = useState(""); 
+  const [selectedArtId, setSelectedArtId] = useState("");
   const [selectedAnalistaId, setSelectedAnalistaId] = useState("");
 
   const {
@@ -26,7 +26,7 @@ export const ListarSiniestros = () => {
     error: artsError,
   } = useArts();
 
-   const {
+  const {
     usuarios: analistas = [],
     isLoading: analistasLoading,
     error: analistasError,
@@ -105,7 +105,22 @@ export const ListarSiniestros = () => {
   return (
     <main className="mt-5 px-5 overflow-y-auto">
       <div className="d-flex justify-content-between align-items-center pt-5">
-        <h2 className="">Lista de Siniestros</h2>
+        <div class="input-group mb-3 w-50">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ingresá el número de siniestro"
+            aria-label="Recipient’s username"
+            aria-describedby="button-addon2"
+          />
+          <button
+            class="btn btn-outline-warning"
+            type="button"
+            id="button-addon2"
+          >
+            Buscar
+          </button>
+        </div>
         <button
           className="btn btn-warning mb-3"
           onClick={() => navigate("/siniestros")}
@@ -150,7 +165,7 @@ export const ListarSiniestros = () => {
               <th>Accidentado</th>
               <th>Tipo</th>
               <th>
-                 <select
+                <select
                   className="form-select form-select-sm"
                   style={{
                     border: "none",
