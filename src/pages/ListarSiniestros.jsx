@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "../utils/ThemeState";
 import {
   useSiniestros,
@@ -9,17 +9,39 @@ import {
 } from "../hooks/useSiniestro";
 import useListaUsuarios from "../hooks/useListaUsuarios";
 import { useNavigate } from "react-router-dom";
-import formatDate from '../utils/formatDate';
-import DeleteIcon from "../assets/icons/delete.svg?react";
+import formatDate from "../utils/formatDate";
+import { toast } from "react-toastify";
+import { useArts } from "../hooks/useGetArt"; // Ajustá la ruta según tu proyecto
 
 export const ListarSiniestros = () => {
-  const { data: siniestros = [], isLoading, error } = useSiniestros();
+  // -------------------------------
+  // 1. Estado para el filtro de ART y lista de ART
+  // -------------------------------
+  const [selectedArtId, setSelectedArtId] = useState(""); // "" = sin filtro
+  const {
+    data: arts = [],
+    isLoading: artsLoading,
+    error: artsError,
+  } = useArts();
+
+  // -------------------------------
+  // 2. Hook para obtener siniestros, pasándole el artId
+  // -------------------------------
+  const {
+    data: siniestros = [],
+    isLoading: siniestrosLoading,
+    error: siniestrosError,
+  } = useSiniestros({ artId: selectedArtId });
+
   const deleteMutation = useDeleteSiniestro();
   const assignAnalista = useAssignAnalista();
-  console.log(siniestros);
   const { usuarios: analistas } = useListaUsuarios();
   const { theme } = useTheme();
   const navigate = useNavigate();
+
+  // -------------------------------
+  // 3. Modal y handlers
+  // -------------------------------
   const [showModal, setShowModal] = useState(false);
   const [selectedSiniestro, setSelectedSiniestro] = useState(null);
 
@@ -30,7 +52,7 @@ export const ListarSiniestros = () => {
 
   const handleDelete = (idStro) => {
     deleteMutation.mutate(
-      { idStro: idStro },
+      { idStro },
       {
         onSuccess: () => {
           setShowModal(false);
@@ -55,6 +77,22 @@ export const ListarSiniestros = () => {
     navigate("/siniestros/editar", { state: { formData: siniestro } });
   };
 
+  // -------------------------------
+  // 4. Feedback de carga/error
+  // -------------------------------
+  if (artsLoading || siniestrosLoading) {
+    return <p>Cargando datos…</p>;
+  }
+  if (artsError) {
+    return <p>Error al cargar lista de ART: {artsError.message}</p>;
+  }
+  if (siniestrosError) {
+    return <p>Error al cargar siniestros: {siniestrosError.message}</p>;
+  }
+
+  // -------------------------------
+  // 5. Renderizado de la tabla
+  // -------------------------------
   return (
     <main className="mt-5 px-5 overflow-y-auto">
       <div className="d-flex justify-content-between align-items-center pt-5">
@@ -67,6 +105,7 @@ export const ListarSiniestros = () => {
         </button>
       </div>
       <br />
+
       <div className="table-responsive">
         <table className="table table-striped table-hover no-wrap">
           <thead
@@ -78,26 +117,51 @@ export const ListarSiniestros = () => {
               <th>Número Stro.</th>
               <th>Fecha de Ingreso</th>
               <th>Fecha de Vto.</th>
-              <th>Nombre ART</th>
-              <th>Lugar del hecho</th>
-              <th>Localidad</th>
+              <th>
+                <select
+                  className="form-select form-select-sm"
+                  style={{
+                    border: "none",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    height: "26px",
+                    width: "150px",
+                  }}
+                  value={selectedArtId}
+                  onChange={(e) => setSelectedArtId(e.target.value)}
+                >
+                  <option value="">Todas las ART</option>
+                  {arts.map((art) => (
+                    <option key={art.idART} value={art.idART}>
+                      {art.nombreART}
+                    </option>
+                  ))}
+                </select>
+              </th>
+              <th>Accidentado</th>
+              <th>Tipo</th>
               <th>Analista</th>
               <th></th>
             </tr>
           </thead>
-          <tbody className={`no-wrap table-group-divider`}>
+          <tbody className="no-wrap table-group-divider">
             {siniestros.map((data) => (
               <tr key={data.idStro}>
-                <td>{data.numStro}</td>
+                <td
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handleSummary(data)}
+                >
+                  <strong>{data.numStro}</strong>
+                </td>
                 <td className="fecha">{formatDate(data.fechaIngreso)}</td>
                 <td className="fecha">{formatDate(data.fecha_vencimiento)}</td>
                 <td>{data.art?.nombreART}</td>
-                <td>{data.lugar_direccion}</td>
-                <td>{data.localidad}</td>
+                <td>{data.trabajador?.apellido || "Sin datos"}</td>
+                <td>{data.tipoStro}</td>
                 <td>
                   <select
                     style={{ width: "140px" }}
-                    className="form-select form-select-sm"
+                    className="form-select form-select-sm border border-warning"
                     value={data.analista?.id ?? ""}
                     onChange={(e) =>
                       handleSelectAnalista(data.idStro, e.target.value)
@@ -159,6 +223,7 @@ export const ListarSiniestros = () => {
           </tbody>
         </table>
       </div>
+
       {/* Modal de Bootstrap */}
       {selectedSiniestro && (
         <div

@@ -1,88 +1,117 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSelector } from 'react-redux';
-import { ToastContainer, toast } from 'react-toastify';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
-const fetchSiniestros = async (token) => {
-  const res = await fetch(`${API_URL}/siniestros`, {
+const fetchSiniestros = async (
+  token,
+  { artId, tipoStro, tipoInvestigacion, resultado } = {}
+) => {
+  // Construimos el query string con sólo los parámetros que no sean null/undefined/""
+  const queryParams = new URLSearchParams();
+  if (artId != null && artId !== "") {
+    queryParams.set("artId", artId);
+  }
+  if (tipoStro != null && tipoStro !== "") {
+    queryParams.set("tipoStro", tipoStro);
+  }
+  if (tipoInvestigacion != null && tipoInvestigacion !== "") {
+    queryParams.set("tipoInvestigacion", tipoInvestigacion);
+  }
+  if (resultado != null && resultado !== "") {
+    queryParams.set("resultado", resultado);
+  }
+
+  // Si hay algún parámetro, lo anexamos a la URL
+  const url =
+    queryParams.toString().length > 0
+      ? `${API_URL}/siniestros?${queryParams.toString()}`
+      : `${API_URL}/siniestros`;
+
+  const res = await fetch(url, {
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
   });
-  if (!res.ok) throw new Error('Error al cargar los siniestros');
+  if (!res.ok) throw new Error("Error al cargar los siniestros");
   return res.json();
 };
-
-
-
 
 // Crear siniestro
 const crearSiniestro = async ({ formData, token }) => {
   const res = await fetch(`${API_URL}/siniestros`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(formData),
   });
-  if (!res.ok) throw new Error('Error al crear el siniestro');
+  if (!res.ok) throw new Error("Error al crear el siniestro");
   return res.json();
 };
 
 // Eliminar siniestro
 const deleteSiniestro = async ({ idStro, token }) => {
-  console.log(idStro)
+  console.log(idStro);
   const res = await fetch(`${API_URL}/siniestros/${idStro}`, {
-    method: 'DELETE',
+    method: "DELETE",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
   });
-  if (!res.ok) throw new Error('Error al eliminar el siniestro');
+  if (!res.ok) throw new Error("Error al eliminar el siniestro");
   return idStro;
 };
 
 // Editar siniestro
 const updateSiniestro = async ({ idStro, updatedData, token }) => {
   const res = await fetch(`${API_URL}/siniestros/${idStro}`, {
-    method: 'PUT',
+    method: "PUT",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(updatedData),
   });
-  if (!res.ok) throw new Error('Error al editar el siniestro');
+  if (!res.ok) throw new Error("Error al editar el siniestro");
   return res.json();
 };
 
 // Asignar analista
 const assignAnalista = async ({ idStro, analistaId, token }) => {
   const res = await fetch(`${API_URL}/siniestros/${idStro}/analista`, {
-    method: 'PATCH',
+    method: "PATCH",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ analistaId }),
   });
-  if (!res.ok) throw new Error('No se pudo asignar analista');
+  if (!res.ok) throw new Error("No se pudo asignar analista");
   return { idStro, analistaId };
 };
 
-// Hook para obtener siniestros
-export const useSiniestros = () => {
+export const useSiniestros = ({
+  artId,
+  tipoStro,
+  tipoInvestigacion,
+  resultado,
+} = {}) => {
   const token = useSelector((state) => state.user.jwt);
+
   return useQuery({
-    queryKey: ['siniestros'],
-    queryFn: () => fetchSiniestros(token),
+    // Incluimos los filtros en la queryKey para que React Query sepa cuándo refetchear
+    queryKey: ["siniestros", { artId, tipoStro, tipoInvestigacion, resultado }],
+    queryFn: () =>
+      fetchSiniestros(token, { artId, tipoStro, tipoInvestigacion, resultado }),
+    // Opcional: si quieres refrescar al reintentar etc.
+    staleTime: 1000 * 60 * 2, // 2 minutos (ajusta a tu gusto)
   });
 };
-
 
 export const useCrearSiniestro = () => {
   const token = useSelector((state) => state.user.jwt);
@@ -93,20 +122,18 @@ export const useCrearSiniestro = () => {
       try {
         return await crearSiniestro({ formData, token });
       } catch (error) {
-        console.error('Error en crearSiniestro:', error);
-        throw error; 
+        console.error("Error en crearSiniestro:", error);
+        throw error;
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['siniestros']);
+      queryClient.invalidateQueries(["siniestros"]);
     },
     onError: (error) => {
-      console.error('Falló la creación del siniestro:', error);
-
+      console.error("Falló la creación del siniestro:", error);
     },
   });
 };
-
 
 // Hook para eliminar siniestro
 export const useDeleteSiniestro = () => {
@@ -115,7 +142,7 @@ export const useDeleteSiniestro = () => {
   return useMutation({
     mutationFn: ({ idStro }) => deleteSiniestro({ idStro, token }),
     onSuccess: () => {
-      queryClient.invalidateQueries(['siniestros']);
+      queryClient.invalidateQueries(["siniestros"]);
     },
   });
 };
@@ -128,7 +155,7 @@ export const useUpdateSiniestro = () => {
     mutationFn: ({ idStro, updatedData }) =>
       updateSiniestro({ idStro, updatedData, token }),
     onSuccess: () => {
-      queryClient.invalidateQueries(['siniestros']);
+      queryClient.invalidateQueries(["siniestros"]);
     },
   });
 };
@@ -141,7 +168,7 @@ export const useAssignAnalista = () => {
     mutationFn: ({ idStro, analistaId }) =>
       assignAnalista({ idStro, analistaId, token }),
     onSuccess: () => {
-      queryClient.invalidateQueries(['siniestros']);
+      queryClient.invalidateQueries(["siniestros"]);
     },
   });
 };
