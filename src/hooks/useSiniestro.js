@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
+import { ToastContainer, toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -82,19 +83,30 @@ export const useSiniestros = () => {
   });
 };
 
-// Hook para crear siniestro
+
 export const useCrearSiniestro = () => {
   const token = useSelector((state) => state.user.jwt);
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ formData }) => {
-      return crearSiniestro({ formData, token });
+    mutationFn: async ({ formData }) => {
+      try {
+        return await crearSiniestro({ formData, token });
+      } catch (error) {
+        console.error('Error en crearSiniestro:', error);
+        throw error; 
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['siniestros']);
     },
+    onError: (error) => {
+      console.error('Falló la creación del siniestro:', error);
+
+    },
   });
 };
+
 
 // Hook para eliminar siniestro
 export const useDeleteSiniestro = () => {

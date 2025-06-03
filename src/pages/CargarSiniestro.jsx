@@ -31,7 +31,7 @@ const initialFormData = {
 export const CargarSiniestro = () => {
   const { data: arts = [], isLoading, error : errorart } = useArts();
   const { mutateAsync: createTrabajador } = useCreateTrabajador();
-  const { mutateAsync: crearSiniestro, isLoading: loading , error, success} = useCrearSiniestro();
+  const { mutate, isLoading: loading , error, success} = useCrearSiniestro();
   
 
   const { theme } = useTheme();
@@ -55,7 +55,6 @@ export const CargarSiniestro = () => {
     artId: null,
     trabajadorId: "",
   });
-
   const [formDataTrabajador, setFormDataTrabajador] = useState(initialFormData);
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
@@ -76,7 +75,6 @@ const handleSubmit = (e) => {
   createTrabajador(formDataTrabajador, {
     onSuccess: (trabajadorCreado) => {
       const idTrabajador = trabajadorCreado.id;
-      console.log("ID Trabajador:", idTrabajador);
 
       const payload = {
         formData: {
@@ -85,9 +83,7 @@ const handleSubmit = (e) => {
         }
       };
 
-      console.log("Payload a enviar:", payload);
-
-      crearSiniestro(payload, {
+      mutate(payload, {
         onSuccess: () => {
           toast.success('Siniestro creado correctamente');
           setFormData({
@@ -111,6 +107,7 @@ const handleSubmit = (e) => {
             trabajadorId: "",
             aseguradoId: "",  
           });
+          setFormDataTrabajador(initialFormData);
         },
         onError: () => {
           toast.error('Error al crear el siniestro');
@@ -122,7 +119,6 @@ const handleSubmit = (e) => {
     }
   });
 };
-
 
 
 
@@ -145,6 +141,7 @@ const handleSubmit = (e) => {
               value={formData.numStro}
               onChange={handleChange}
               placeholder="Ej: 12345678"
+              required
             />
           </div>
           <div className="col-md-4 mb-3">
@@ -194,6 +191,7 @@ const handleSubmit = (e) => {
     value={formDataTrabajador.dni}
     onChange={handleChange}
     placeholder="Ej: 33874652"
+    required
   />
 </div>
 <div className="col-md-3">
@@ -205,6 +203,7 @@ const handleSubmit = (e) => {
     value={formDataTrabajador.nombre}
     onChange={handleChange}
     placeholder="Ej: Matias"
+    required
   />
 </div>
 <div className="col-md-3">
@@ -216,6 +215,7 @@ const handleSubmit = (e) => {
     value={formDataTrabajador.apellido}
     onChange={handleChange}
     placeholder="Ej: Martinez"
+    required
   />
 </div>
 <div className="col-md-3">
@@ -358,6 +358,7 @@ const handleSubmit = (e) => {
               value={formData.lugar_direccion}
               onChange={handleChange}
               placeholder="Ej: Cordoba 1000"
+              required
             />
           </div>
           <div className="col-md-3">
@@ -384,6 +385,7 @@ const handleSubmit = (e) => {
               value={formData.localidad}
               onChange={handleChange}
               placeholder="Ej: Avellaneda"
+              required
             />
           </div>
           <div className="col-md-2">
@@ -395,6 +397,7 @@ const handleSubmit = (e) => {
               className="form-select"
               value={formData.provincia}
               onChange={handleChange}
+              required
             >
               <option value="">Seleccione</option>
               <option value="Buenos Aires">Buenos Aires</option>
@@ -422,6 +425,7 @@ const handleSubmit = (e) => {
               value={formData.mechanicaHecho}
               onChange={handleChange}
               placeholder="Describa la mecánica de los hechos..."
+              required
             ></textarea>
           </div>
           <hr />
@@ -435,6 +439,7 @@ const handleSubmit = (e) => {
               className="form-select"
               value={formData.gravedad}
               onChange={handleChange}
+              required
             >
               <option value="0">Seleccione</option>
               <option value="Leve">Leve</option>
@@ -453,6 +458,7 @@ const handleSubmit = (e) => {
               className="form-select"
               value={formData.tipoInvestigacion}
               onChange={handleChange}
+              required
             >
               <option value="">Seleccione</option>
               <option value="Tipo 1">In Situ</option>
@@ -474,6 +480,7 @@ const handleSubmit = (e) => {
               value={formData.nombrePrestadorMedico}
               onChange={handleChange}
               placeholder="Ej: Galeno"
+              required
             />
           </div>
           <div className="col-md-4">
@@ -487,6 +494,7 @@ const handleSubmit = (e) => {
               value={formData.lesiones}
               onChange={handleChange}
               placeholder="Ingrese Lesiones"
+              required
             />
           </div>
           <div className="mb-3">
@@ -516,6 +524,7 @@ const handleSubmit = (e) => {
               value={formData.tipoStro}
               onChange={handleChange}
               placeholder="Ingrese el tipo de Siniestro"
+              required
             />
           </div>
           {/* <div className="col-md-7">
@@ -568,7 +577,7 @@ const handleSubmit = (e) => {
               {loading ? "Cargando..." : "Cargar Siniestro"}
             </button>
           </div>
-          {error != null ? <p className="text-danger">{error}</p> : ""}
+          
           {success ? (
             <p className="text-success">Siniestro creado con exito</p>
           ) : (
