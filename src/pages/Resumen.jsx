@@ -37,7 +37,7 @@ export const Resumen = () => {
 <p><strong className='text-warning'>DNI:</strong>  {formData.trabajador?.dni}</p>
 <p><strong className='text-warning'>Nombre y Apellido:</strong> {formData.trabajador?.nombre} {formData.trabajador?.apellido}</p>
 <p><strong className='text-warning'>Teléfono 1:</strong> {formData.trabajador?.telefono}</p>
-<p><strong className='text-warning'>Teléfono 2:</strong>{formData.trabajador?.telefono2}</p>
+<p><strong className='text-warning'>Teléfono 2:</strong> {formData.trabajador?.telefono2}</p>
 </div>
 <div>
 
