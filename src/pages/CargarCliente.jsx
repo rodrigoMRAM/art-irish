@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import useCrearArt from "../hooks/useCreateArt"; // Asegurate de importar correctamente
 import { useTheme } from '../utils/ThemeState';
 import { ToastContainer, toast } from 'react-toastify';
+import { useNavigate } from "react-router-dom";
 
 export const CargarCliente = () => {
   const { theme } = useTheme();
@@ -10,6 +11,7 @@ export const CargarCliente = () => {
     nombreAnalista: "",
     apellidoAnalista: "",
   });
+  const navigate = useNavigate();
 
   const { crearArt, loading, error, success } = useCrearArt();
 
@@ -23,6 +25,7 @@ export const CargarCliente = () => {
     onSuccess: () => {
       toast.success("Cliente creado con éxito");
       setForm({ nombreART: "", nombreAnalista: "", apellidoAnalista: "" });
+      navigate("/listar/art");
     },
     onError: (error) => {
       toast.error(`Error: ${error.message}`);

@@ -1,25 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useTheme } from "../utils/ThemeState";
 import {
   useSiniestros,
-  useCrearSiniestro,
   useDeleteSiniestro,
-  useUpdateSiniestro,
   useAssignAnalista,
 } from "../hooks/useSiniestro";
 import useListaUsuarios from "../hooks/useListaUsuarios";
+import { useArts } from "../hooks/useGetArt";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import formatDate from "../utils/formatDate";
 import { toast } from "react-toastify";
-import { useArts } from "../hooks/useGetArt";
 
 export const ListarSiniestros = () => {
   // -------------------------------
-  // 1. Estado para el filtro de ART y Analista
+  // 1. Estados para filtros y búsqueda
   // -------------------------------
+  const [inputNumStro, setInputNumStro] = useState("");
+  const [numStroSearch, setNumStroSearch] = useState("");
   const [selectedArtId, setSelectedArtId] = useState("");
   const [selectedAnalistaId, setSelectedAnalistaId] = useState("");
 
+  const token = useSelector((state) => state.user.jwt);
+
+  // -------------------------------
+  // 2. Cargar listas de ART y analistas
+  // -------------------------------
   const {
     data: arts = [],
     isLoading: artsLoading,
@@ -33,13 +39,18 @@ export const ListarSiniestros = () => {
   } = useListaUsuarios();
 
   // -------------------------------
-  // 2. Hook para obtener siniestros, pasándole el artId
+  // 3. Hook para obtener siniestros:
+  //    pasa numStroSearch, artId y analistaId
   // -------------------------------
   const {
     data: siniestros = [],
     isLoading: siniestrosLoading,
     error: siniestrosError,
-  } = useSiniestros({ artId: selectedArtId, analistaId: selectedAnalistaId });
+  } = useSiniestros({
+    numStro: numStroSearch,
+    artId: selectedArtId,
+    analistaId: selectedAnalistaId,
+  });
 
   const deleteMutation = useDeleteSiniestro();
   const assignAnalista = useAssignAnalista();
@@ -47,7 +58,7 @@ export const ListarSiniestros = () => {
   const navigate = useNavigate();
 
   // -------------------------------
-  // 3. Modal y handlers
+  // 4. Modal y handlers
   // -------------------------------
   const [showModal, setShowModal] = useState(false);
   const [selectedSiniestro, setSelectedSiniestro] = useState(null);
@@ -64,6 +75,10 @@ export const ListarSiniestros = () => {
         onSuccess: () => {
           setShowModal(false);
           toast.success("Eliminado correctamente");
+          // Si había búsqueda activa, refrescarla
+          if (numStroSearch) {
+            setNumStroSearch(numStroSearch);
+          }
         },
         onError: () => {
           toast.error("Error al eliminar");
@@ -85,7 +100,14 @@ export const ListarSiniestros = () => {
   };
 
   // -------------------------------
-  // 4. Feedback de carga/error
+  // 5. Ejecutar búsqueda por numStro al hacer clic
+  // -------------------------------
+  const handleSearchClick = () => {
+    setNumStroSearch(inputNumStro);
+  };
+
+  // -------------------------------
+  // 6. Feedback de carga / errores
   // -------------------------------
   if (artsLoading || analistasLoading || siniestrosLoading) {
     return <p>Cargando datos…</p>;
@@ -99,24 +121,26 @@ export const ListarSiniestros = () => {
   if (siniestrosError) {
     return <p>Error al cargar siniestros: {siniestrosError.message}</p>;
   }
+
   // -------------------------------
-  // 5. Renderizado de la tabla
+  // 7. Renderizado de la vista
   // -------------------------------
   return (
     <main className="mt-5 px-5 overflow-y-auto">
-      <div className="d-flex justify-content-between align-items-center pt-5">
-        <div class="input-group mb-3 w-50">
+      {/* Barra superior: input de búsqueda y botón “Nuevo” */}
+      <div className="d-flex justify-content-between align-items-center pt-5 flex-wrap">
+        <div className="input-group mb-3 w-50">
           <input
-            type="text"
-            class="form-control"
+            type="number"
+            className="form-control"
             placeholder="Ingresá el número de siniestro"
-            aria-label="Recipient’s username"
-            aria-describedby="button-addon2"
+            value={inputNumStro}
+            onChange={(e) => setInputNumStro(e.target.value)}
           />
           <button
-            class="btn btn-outline-warning"
+            className="btn btn-outline-warning"
             type="button"
-            id="button-addon2"
+            onClick={handleSearchClick}
           >
             Buscar
           </button>
@@ -130,12 +154,11 @@ export const ListarSiniestros = () => {
       </div>
       <br />
 
+      {/* Tabla de siniestros */}
       <div className="table-responsive">
         <table className="table table-striped table-hover no-wrap">
           <thead
-            className={`${
-              theme === "dark" ? "table-dark" : "table-light"
-            } no-wrap`}
+            className={`${theme === "dark" ? "table-dark" : "table-light"} no-wrap`}
           >
             <tr>
               <th>Número Stro.</th>
@@ -152,7 +175,10 @@ export const ListarSiniestros = () => {
                     width: "150px",
                   }}
                   value={selectedArtId}
-                  onChange={(e) => setSelectedArtId(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedArtId(e.target.value);
+                    setNumStroSearch(""); // cancelar búsqueda si cambio filtro
+                  }}
                 >
                   <option value="">Todas las ART</option>
                   {arts.map((art) => (
@@ -175,9 +201,12 @@ export const ListarSiniestros = () => {
                     width: "150px",
                   }}
                   value={selectedAnalistaId}
-                  onChange={(e) => setSelectedAnalistaId(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedAnalistaId(e.target.value);
+                    setNumStroSearch(""); // cancelar búsqueda si cambio filtro
+                  }}
                 >
-                  <option value="">Analistas</option>
+                  <option value="">Todos los Analistas</option>
                   {analistas.map((a) => (
                     <option key={a.id} value={a.id}>
                       {a.nombre} {a.apellido}
@@ -189,86 +218,93 @@ export const ListarSiniestros = () => {
             </tr>
           </thead>
           <tbody className="no-wrap table-group-divider">
-            {siniestros.map((data) => (
-              <tr key={data.idStro}>
-                <td
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleSummary(data)}
-                >
-                  <strong>{data.numStro}</strong>
-                </td>
-                <td className="fecha">{formatDate(data.fechaIngreso)}</td>
-                <td className="fecha">{formatDate(data.fecha_vencimiento)}</td>
-                <td>{data.art?.nombreART}</td>
-                <td>{data.trabajador?.apellido || "Sin datos"}</td>
-                <td>{data.tipoStro}</td>
-                <td>
-                  <select
-                    style={{ width: "140px" }}
-                    className="form-select form-select-sm border border-warning"
-                    value={data.analista?.id ?? ""}
-                    onChange={(e) =>
-                      handleSelectAnalista(data.idStro, e.target.value)
-                    }
-                  >
-                    <option value="">Sin asignar</option>
-                    {analistas.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.nombre} {a.apellido}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-
-                <td>
-                  <div className="dropdown">
-                    <button
-                      className="btn"
-                      type="button"
-                      id={`dropdownMenuButton-${data.idStro}`}
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      &#x22EE;
-                    </button>
-                    <ul
-                      className="dropdown-menu"
-                      aria-labelledby={`dropdownMenuButton-${data.idStro}`}
-                    >
-                      <li>
-                        <button
-                          className="dropdown-item"
-                          onClick={() => handleSummary(data)}
-                        >
-                          <b>Ver Siniestro</b>
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          className="dropdown-item"
-                          onClick={() => handleEdit(data)}
-                        >
-                          Editar
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          className="dropdown-item text-danger"
-                          onClick={() => handleShowModal(data)}
-                        >
-                          Eliminar
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
+            {siniestros.length === 0 ? (
+              <tr>
+                <td colSpan="8" className="text-center">
+                  Sin resultados.
                 </td>
               </tr>
-            ))}
+            ) : (
+              siniestros.map((data) => (
+                <tr key={data.idStro}>
+                  <td
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleSummary(data)}
+                  >
+                    <strong>{data.numStro}</strong>
+                  </td>
+                  <td className="fecha">{formatDate(data.fechaIngreso)}</td>
+                  <td className="fecha">{formatDate(data.fecha_vencimiento)}</td>
+                  <td>{data.art?.nombreART || "Sin datos"}</td>
+                  <td>{data.trabajador?.apellido || "Sin datos"}</td>
+                  <td>{data.tipoStro || "Sin datos"}</td>
+                  <td>
+                    <select
+                      style={{ width: "140px" }}
+                      className="form-select form-select-sm border border-warning"
+                      value={data.analista?.id ?? ""}
+                      onChange={(e) =>
+                        handleSelectAnalista(data.idStro, e.target.value)
+                      }
+                    >
+                      <option value="">Sin asignar</option>
+                      {analistas.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.nombre} {a.apellido}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td>
+                    <div className="dropdown">
+                      <button
+                        className="btn"
+                        type="button"
+                        id={`dropdownMenuButton-${data.idStro}`}
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                      >
+                        &#x22EE;
+                      </button>
+                      <ul
+                        className="dropdown-menu"
+                        aria-labelledby={`dropdownMenuButton-${data.idStro}`}
+                      >
+                        <li>
+                          <button
+                            className="dropdown-item"
+                            onClick={() => handleSummary(data)}
+                          >
+                            <b>Ver Siniestro</b>
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            className="dropdown-item"
+                            onClick={() => handleEdit(data)}
+                          >
+                            Editar
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            className="dropdown-item text-danger"
+                            onClick={() => handleShowModal(data)}
+                          >
+                            Eliminar
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
-      {/* Modal de Bootstrap */}
+      {/* Modal de confirmación */}
       {selectedSiniestro && (
         <div
           className={`modal fade ${showModal ? "show" : ""}`}
@@ -288,12 +324,12 @@ export const ListarSiniestros = () => {
                   className="btn-close"
                   onClick={() => setShowModal(false)}
                   aria-label="Close"
-                ></button>
+                />
               </div>
               <div className="modal-body">
                 <p>
                   ¿Estás seguro de que deseas eliminar el siniestro{" "}
-                  {selectedSiniestro.numStro}?
+                  <strong>{selectedSiniestro.numStro}</strong>?
                 </p>
               </div>
               <div className="modal-footer">
