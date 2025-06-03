@@ -11,18 +11,26 @@ import useListaUsuarios from "../hooks/useListaUsuarios";
 import { useNavigate } from "react-router-dom";
 import formatDate from "../utils/formatDate";
 import { toast } from "react-toastify";
-import { useArts } from "../hooks/useGetArt"; // Ajustá la ruta según tu proyecto
+import { useArts } from "../hooks/useGetArt"; 
 
 export const ListarSiniestros = () => {
   // -------------------------------
-  // 1. Estado para el filtro de ART y lista de ART
+  // 1. Estado para el filtro de ART y Analista
   // -------------------------------
-  const [selectedArtId, setSelectedArtId] = useState(""); // "" = sin filtro
+  const [selectedArtId, setSelectedArtId] = useState(""); 
+  const [selectedAnalistaId, setSelectedAnalistaId] = useState("");
+
   const {
     data: arts = [],
     isLoading: artsLoading,
     error: artsError,
   } = useArts();
+
+   const {
+    usuarios: analistas = [],
+    isLoading: analistasLoading,
+    error: analistasError,
+  } = useListaUsuarios();
 
   // -------------------------------
   // 2. Hook para obtener siniestros, pasándole el artId
@@ -31,11 +39,10 @@ export const ListarSiniestros = () => {
     data: siniestros = [],
     isLoading: siniestrosLoading,
     error: siniestrosError,
-  } = useSiniestros({ artId: selectedArtId });
+  } = useSiniestros({ artId: selectedArtId, analistaId: selectedAnalistaId });
 
   const deleteMutation = useDeleteSiniestro();
   const assignAnalista = useAssignAnalista();
-  const { usuarios: analistas } = useListaUsuarios();
   const { theme } = useTheme();
   const navigate = useNavigate();
 
@@ -80,16 +87,18 @@ export const ListarSiniestros = () => {
   // -------------------------------
   // 4. Feedback de carga/error
   // -------------------------------
-  if (artsLoading || siniestrosLoading) {
+  if (artsLoading || analistasLoading || siniestrosLoading) {
     return <p>Cargando datos…</p>;
   }
   if (artsError) {
     return <p>Error al cargar lista de ART: {artsError.message}</p>;
   }
+  if (analistasError) {
+    return <p>Error al cargar lista de analistas: {analistasError.message}</p>;
+  }
   if (siniestrosError) {
     return <p>Error al cargar siniestros: {siniestrosError.message}</p>;
   }
-
   // -------------------------------
   // 5. Renderizado de la tabla
   // -------------------------------
@@ -140,7 +149,27 @@ export const ListarSiniestros = () => {
               </th>
               <th>Accidentado</th>
               <th>Tipo</th>
-              <th>Analista</th>
+              <th>
+                 <select
+                  className="form-select form-select-sm"
+                  style={{
+                    border: "none",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    height: "26px",
+                    width: "150px",
+                  }}
+                  value={selectedAnalistaId}
+                  onChange={(e) => setSelectedAnalistaId(e.target.value)}
+                >
+                  <option value="">Analistas</option>
+                  {analistas.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.nombre} {a.apellido}
+                    </option>
+                  ))}
+                </select>
+              </th>
               <th></th>
             </tr>
           </thead>

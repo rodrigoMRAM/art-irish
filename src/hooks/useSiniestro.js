@@ -6,12 +6,15 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const fetchSiniestros = async (
   token,
-  { artId, tipoStro, tipoInvestigacion, resultado } = {}
+  { artId, analistaId, tipoStro, tipoInvestigacion, resultado } = {}
 ) => {
   // Construimos el query string con sólo los parámetros que no sean null/undefined/""
   const queryParams = new URLSearchParams();
   if (artId != null && artId !== "") {
     queryParams.set("artId", artId);
+  }
+  if (analistaId != null && analistaId !== "") {
+    queryParams.set("analistaId", analistaId);
   }
   if (tipoStro != null && tipoStro !== "") {
     queryParams.set("tipoStro", tipoStro);
@@ -97,6 +100,7 @@ const assignAnalista = async ({ idStro, analistaId, token }) => {
 
 export const useSiniestros = ({
   artId,
+  analistaId,
   tipoStro,
   tipoInvestigacion,
   resultado,
@@ -105,9 +109,9 @@ export const useSiniestros = ({
 
   return useQuery({
     // Incluimos los filtros en la queryKey para que React Query sepa cuándo refetchear
-    queryKey: ["siniestros", { artId, tipoStro, tipoInvestigacion, resultado }],
+    queryKey: ["siniestros", { artId, analistaId, tipoStro, tipoInvestigacion, resultado }],
     queryFn: () =>
-      fetchSiniestros(token, { artId, tipoStro, tipoInvestigacion, resultado }),
+      fetchSiniestros(token, { artId, analistaId, tipoStro, tipoInvestigacion, resultado }),
     // Opcional: si quieres refrescar al reintentar etc.
     staleTime: 1000 * 60 * 2, // 2 minutos (ajusta a tu gusto)
   });
