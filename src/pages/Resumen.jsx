@@ -59,7 +59,7 @@ export const Resumen = () => {
             </p>
              <p>
               <strong className="text-warning">Cliente (ART):</strong>{" "}
-              {mostrar(art.nombreART)}
+              {`${mostrar(art.nombreART)}${art.nombreAnalista ? ` (${mostrar(art.nombreAnalista)} ${mostrar(art.apellidoAnalista)})` : ''}`}
             </p>
           </div>
           <div className="text-end">
@@ -136,7 +136,7 @@ export const Resumen = () => {
         </div>
 
         {/* Sección: Lugar del Hecho */}
-        <h2 className="mt-4">Lugar del Hecho</h2>
+        <h2 className="mt-4">Datos del siniestro</h2>
         <hr />
         <div className="mb-3">
           <p>
@@ -155,14 +155,19 @@ export const Resumen = () => {
             <strong className="text-warning">Provincia:</strong>{" "}
             {mostrar(formData.provincia)}
           </p>
-          <p>
-            <strong className="text-warning">Mecánica del Hecho:</strong>{" "}
-            {mostrar(formData.mechanicaHecho)}
-          </p>
         </div>
+        <h2 className="mt-4">Mecánica del Hecho:</h2>
+        <hr />
+        <Card className="mb-4">
+          <Card.Body>
+            {formData.mechanicaHecho
+              ? formData.mechanicaHecho
+              : "Sin datos"}
+          </Card.Body>
+        </Card>
 
         {/* Sección: Detalles */}
-        <h2 className="mt-4">Detalles</h2>
+        <h2 className="mt-4">Otros detalles</h2>
         <hr />
         <div className="row">
           <div className="col-md-4 mb-3">

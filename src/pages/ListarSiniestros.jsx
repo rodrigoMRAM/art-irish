@@ -11,6 +11,8 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import formatDate from "../utils/formatDate";
 import { toast } from "react-toastify";
+import Search from '../assets/icons/search.svg';
+import Close from '../assets/icons/close.svg'; 
 
 export const ListarSiniestros = () => {
   // -------------------------------
@@ -38,6 +40,12 @@ export const ListarSiniestros = () => {
     error: analistasError,
   } = useListaUsuarios();
 
+   const manejarKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearchClick(); 
+    }
+  };
+
   // -------------------------------
   // 3. Hook para obtener siniestros:
   //    pasa numStroSearch, artId y analistaId
@@ -51,6 +59,8 @@ export const ListarSiniestros = () => {
     artId: selectedArtId,
     analistaId: selectedAnalistaId,
   });
+
+  
 
   const deleteMutation = useDeleteSiniestro();
   const assignAnalista = useAssignAnalista();
@@ -129,22 +139,40 @@ export const ListarSiniestros = () => {
     <main className="mt-5 px-5 overflow-y-auto">
       {/* Barra superior: input de búsqueda y botón “Nuevo” */}
       <div className="d-flex justify-content-between align-items-center pt-5 flex-wrap">
-        <div className="input-group mb-3 w-50">
-          <input
-            type="number"
-            className="form-control"
-            placeholder="Ingresá el número de siniestro"
-            value={inputNumStro}
-            onChange={(e) => setInputNumStro(e.target.value)}
-          />
-          <button
-            className="btn btn-outline-warning"
-            type="button"
-            onClick={handleSearchClick}
-          >
-            Buscar
-          </button>
-        </div>
+        <div className="d-flex w-50 align-items-center gap-2">
+
+      <div className="mb-3 w-50" style={{ position: 'relative' }}>
+  <input
+    type="text"
+    className="form-control"
+    placeholder="Ingresá el número de siniestro"
+    value={inputNumStro}
+    onKeyDown={manejarKeyDown}
+    
+    onChange={(e) => {
+      const value = e.target.value;
+      if (/^\d*$/.test(value)) { // solo permite números
+        setInputNumStro(value);
+      }
+    }}
+    pla
+    style={{ paddingRight: '2.5rem' }} 
+    />
+  <img src={Search}
+    onClick={handleSearchClick}
+    style={{
+      position: 'absolute',
+      top: '50%',
+      right: '0.75rem',
+      cursor: 'pointer',
+      transform: 'translateY(-50%)',
+      color: '#6c757d', 
+    }}
+    />
+</div>
+
+  {numStroSearch && <div className="mb-3"> <button className="text-warning bg-transparent border-0 p-0 m-0 shadow-none"ext-decoration-none onClick={()=> setNumStroSearch("")}>Quitar filtro</button><img src={Close} alt="" srcset="" /></div>}
+    </div>    
         <button
           className="btn btn-warning mb-3"
           onClick={() => navigate("/siniestros")}
@@ -302,6 +330,19 @@ export const ListarSiniestros = () => {
             )}
           </tbody>
         </table>
+        <nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-end">
+    <li class="page-item disabled">
+      <a class="page-link">Anterior</a>
+    </li>
+    <li class="page-item text-warning"><a class="page-link text-warning" href="#">1</a></li>
+    <li class="page-item text-warning"><a class="page-link text-warning" href="#">2</a></li>
+    <li class="page-item text-warning"><a class="page-link text-warning" href="#">3</a></li>
+    <li class="page-item text-warning">
+      <a class="page-link text-warning" href="#">Siguiente</a>
+    </li>
+  </ul>
+</nav>
       </div>
 
       {/* Modal de confirmación */}

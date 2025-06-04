@@ -154,6 +154,7 @@ const handleSubmit = (e) => {
               id="fechaYHoraStro"
               value={formData.fechaYHoraStro}
               onChange={handleChange}
+              max={new Date().toISOString().slice(0, 16)}
             />
           </div>
           <div className="col-md-4">

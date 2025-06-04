@@ -16,11 +16,11 @@ export const Home = () => {
   const { theme } = useTheme();
   const user = useSelector((state) => state.user.user);
   const navigate = useNavigate();
-
   const handleSummary = (siniestro) => {
     navigate("/resumen", { state: { formData: siniestro } });
   };
-  console.log(siniestros);
+
+  const siniestrosAnalista = siniestros.filter((data) => data?.analista?.dni == user?.dni);
 
 return (
     <main className="mt-5 px-5">
@@ -28,7 +28,7 @@ return (
 
         <br />
 
-        <h4 className="text-success mt-5">Siniestros en gestión:</h4>
+        <h4 className="text-success mt-5">Siniestros en gestión: {siniestrosAnalista.length}</h4>
         <div className="table-responsive">
             <table className="table table-striped table-hover no-wrap">
                 <thead
@@ -56,7 +56,7 @@ return (
                                 onClick={() => handleSummary(data)}
                             >
                                 <td>{data.numStro}</td>
-                                <td className="fecha">{data.art.nombreAnalista}</td>
+                                <td className="fecha">{data?.art?.nombreAnalista}</td>
                                 <td>{data.art?.nombreART}</td>
                                 <td>
                                     {data.trabajador?.nombre + " " + data.trabajador?.apellido}
