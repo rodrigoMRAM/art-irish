@@ -1,3 +1,4 @@
+// ListarAuditor.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -5,75 +6,91 @@ import {
   useDeleteAuditor,
   useUpdateAuditor,
 } from "../hooks/useGetAuditores";
-import { ToastContainer, toast } from 'react-toastify';
+import useCreateAuditor from "../hooks/useCreateAuditor";
+import { ToastContainer, toast } from "react-toastify";
 import { useTheme } from "../utils/ThemeState";
+import { useQueryClient } from "@tanstack/react-query";
+
+
+import { AuditorFormModal } from "../components/auditor/AuditorFormModal";
+import { DeleteConfirmationModal } from "../components/auditor/DeleteConfirmationModal";
+
 export const ListarAuditor = () => {
   const { data: auditores = [], isLoading, error } = useAuditores();
   const deleteAuditor = useDeleteAuditor();
   const updateAuditor = useUpdateAuditor();
+  const { mutate: createAuditor, isPending: creating } = useCreateAuditor();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { theme } = useTheme();
+
+  // Estados para los modales
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedAuditor, setSelectedAuditor] = useState(null);
-  const [formData, setFormData] = useState({
-    id: "",
-    apellido: "",
-    dni: "",
-    nombre: "",
-    cp: "",
-    domicilio: "",
-    localidad: "",
-  });
 
+  // ------------------ Delete ------------------
   const handleShowDeleteModal = (auditor) => {
     setSelectedAuditor(auditor);
     setShowDeleteModal(true);
   };
+  const handleDeleteConfirm = () => {
+    deleteAuditor.mutate(
+      { id: selectedAuditor.id },
+      {
+        onSuccess: () => {
+          setShowDeleteModal(false);
+          toast.success("Eliminado correctamente");
+          // Refrescar la lista
+          queryClient.invalidateQueries(["auditores"]);
+        },
+        onError: () => {
+          toast.error("Error al eliminar");
+        },
+      }
+    );
+  };
 
-  const handleDelete = () => {
-  deleteAuditor.mutate(
-    { id: selectedAuditor.id },
-    {
-      onSuccess: () => {
-        setShowDeleteModal(false);
-        toast.success('Eliminado correctamente');
-      },
-      onError: () => {
-        toast.error('Error al eliminar');
-      },
-    }
-  );
-};
-
-
+  // ------------------ Edit ------------------
   const handleShowEditModal = (auditor) => {
     setSelectedAuditor(auditor);
-    setFormData(auditor);
     setShowEditModal(true);
   };
-
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleEditSubmit = (formData) => {
+    updateAuditor.mutate(
+      { id: selectedAuditor.id, data: formData },
+      {
+        onSuccess: () => {
+          setShowEditModal(false);
+          toast.success("Actualizado correctamente");
+          queryClient.invalidateQueries(["auditores"]);
+        },
+        onError: () => {
+          toast.error("Error al actualizar");
+        },
+      }
+    );
   };
 
-  const handleEditSubmit = (e) => {
-  e.preventDefault();
-  updateAuditor.mutate(
-    { id: selectedAuditor.id, data: formData },
-    {
+  // ------------------ Create ------------------
+  const handleOpenCreateModal = () => {
+    setShowCreateModal(true);
+  };
+  const handleCreateSubmit = (formData) => {
+    createAuditor(formData, {
       onSuccess: () => {
-        setShowEditModal(false);
-        toast.success('Actualizado correctamente');
+        setShowCreateModal(false);
+        toast.success("Auditor creado con éxito");
+        queryClient.invalidateQueries(["auditores"]);
       },
-      onError: () => {
-        toast.error('Error al actualizar');
+      onError: (err) => {
+        toast.error(`Error: ${err.message}`);
       },
-    }
-  );
-};
+    });
+  };
 
+  // ------------------ Loading / Error ------------------
   if (isLoading) return <p>Cargando auditores...</p>;
   if (error) return <p>Error al cargar auditores</p>;
 
@@ -83,7 +100,7 @@ export const ListarAuditor = () => {
         <h2>Lista de Auditores</h2>
         <button
           className="btn btn-warning mb-3"
-          onClick={() => navigate("/auditor")}
+          onClick={handleOpenCreateModal}
         >
           Nuevo Auditor
         </button>
@@ -93,7 +110,7 @@ export const ListarAuditor = () => {
         <thead className="table-dark">
           <tr>
             <th>DNI</th>
-            <th>Nombre y apellido</th>
+            <th>Nombre y Apellido</th>
             <th>CP</th>
             <th>Domicilio</th>
             <th>Localidad</th>
@@ -104,7 +121,9 @@ export const ListarAuditor = () => {
           {auditores.map((auditor) => (
             <tr key={auditor.id}>
               <td>{auditor.dni}</td>
-              <td>{auditor.nombre+ ' '+ auditor.apellido}</td>
+              <td>
+                {auditor.nombre} {auditor.apellido}
+              </td>
               <td>{auditor.cp}</td>
               <td>{auditor.domicilio}</td>
               <td>{auditor.localidad}</td>
@@ -143,83 +162,51 @@ export const ListarAuditor = () => {
       </table>
 
       {/* Modal de Eliminación */}
-      {showDeleteModal && selectedAuditor && (
-        <div className="modal show d-block">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5>Confirmar Eliminación</h5>
-                <button className="btn-close" onClick={() => setShowDeleteModal(false)} />
-              </div>
-              <div className="modal-body">
-                <p>
-                  ¿Estás seguro que querés eliminar al auditor {selectedAuditor.nombre} {selectedAuditor.apellido}?
-                </p>
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>
-                  Cancelar
-                </button>
-                <button className="btn btn-danger" onClick={handleDelete}>
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmationModal
+        show={showDeleteModal}
+        entityName={
+          selectedAuditor
+            ? `${selectedAuditor.nombre} ${selectedAuditor.apellido}`
+            : ""
+        }
+        onCancel={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteConfirm}
+        theme={theme}
+      />
 
       {/* Modal de Edición */}
-      {showEditModal && selectedAuditor && (
-        <div className="modal show d-block">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5>Editar Auditor</h5>
-                <button className="btn-close" onClick={() => setShowEditModal(false)} />
-              </div>
-              <form onSubmit={handleEditSubmit}>
-                <div className="modal-body">
-                  {["dni", "nombre", "apellido", "cp", "domicilio", "localidad"].map((field) => (
-                    <div className="form-floating mb-3" key={field}>
-                      <input
-                        type="text"
-                        name={field}
-                        value={formData[field]}
-                        onChange={handleEditChange}
-                        className="form-control"
-                        id={field}
-                        placeholder={field}
-                        required
-                      />
-                      <label htmlFor={field}>{field.charAt(0).toUpperCase() + field.slice(1)}</label>
-                    </div>
-                  ))}
-                </div>
-                <div className="modal-footer">
-                  <button className="btn btn-secondary" onClick={() => setShowEditModal(false)}>
-                    Cancelar
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    Guardar cambios
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-       <ToastContainer
-               position="bottom-right"
-               autoClose={1500}
-               hideProgressBar={false}
-               newestOnTop={false}
-               closeOnClick
-               pauseOnFocusLoss
-               draggable
-               pauseOnHover
-               theme={theme === "dark" ? "dark" : "light"}
-             />
+      <AuditorFormModal
+        mode="edit"
+        show={showEditModal}
+        initialData={selectedAuditor}
+        onCancel={() => setShowEditModal(false)}
+        onSubmit={handleEditSubmit}
+        isSubmitting={updateAuditor.isLoading}
+        theme={theme}
+      />
+
+      {/* Modal de Creación */}
+      <AuditorFormModal
+        mode="create"
+        show={showCreateModal}
+        initialData={null}
+        onCancel={() => setShowCreateModal(false)}
+        onSubmit={handleCreateSubmit}
+        isSubmitting={creating}
+        theme={theme}
+      />
+
+      <ToastContainer
+        position="bottom-right"
+        autoClose={1500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={theme === "dark" ? "dark" : "light"}
+      />
     </main>
   );
 };
