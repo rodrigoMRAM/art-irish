@@ -11,7 +11,6 @@ import { ToastContainer, toast } from "react-toastify";
 import { useTheme } from "../utils/ThemeState";
 import { useQueryClient } from "@tanstack/react-query";
 
-
 import { AuditorFormModal } from "../components/auditor/AuditorFormModal";
 import { DeleteConfirmationModal } from "../components/auditor/DeleteConfirmationModal";
 

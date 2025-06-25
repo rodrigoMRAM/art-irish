@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { VscArrowSmallDown, VscArrowSmallUp  } from "react-icons/vsc";
+
 import { useTheme } from "../utils/ThemeState";
 import {
   useSiniestros,
@@ -11,17 +13,21 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import formatDate from "../utils/formatDate";
 import { toast } from "react-toastify";
-import Search from '../assets/icons/search.svg';
-import Close from '../assets/icons/close.svg'; 
+import Search from "../assets/icons/search.svg";
+import Close from "../assets/icons/close.svg";
 
 export const ListarSiniestros = () => {
   // -------------------------------
-  // 1. Estados para filtros y búsqueda
+  // 1. Estados para filtros, búsqueda y paginado
   // -------------------------------
   const [inputNumStro, setInputNumStro] = useState("");
   const [numStroSearch, setNumStroSearch] = useState("");
   const [selectedArtId, setSelectedArtId] = useState("");
   const [selectedAnalistaId, setSelectedAnalistaId] = useState("");
+  const [page, setPage] = useState(0);
+  const size = 5; // Cantidad de siniestros por página
+  // Ordenamiento por fecha de ingreso (descendente)
+  const [sortDir, setSortDir] = useState("desc");
 
   const token = useSelector((state) => state.user.jwt);
 
@@ -40,9 +46,9 @@ export const ListarSiniestros = () => {
     error: analistasError,
   } = useListaUsuarios();
 
-   const manejarKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSearchClick(); 
+  const manejarKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearchClick();
     }
   };
 
@@ -51,16 +57,26 @@ export const ListarSiniestros = () => {
   //    pasa numStroSearch, artId y analistaId
   // -------------------------------
   const {
-    data: siniestros = [],
+    data,
     isLoading: siniestrosLoading,
     error: siniestrosError,
   } = useSiniestros({
     numStro: numStroSearch,
     artId: selectedArtId,
     analistaId: selectedAnalistaId,
+    sortDir,
+    size,
+    page,
   });
 
-  
+  // Normaliza la variable siniestros para que siempre sea un array
+  const siniestros = Array.isArray(data?.content)
+    ? data.content
+    : Array.isArray(data)
+    ? data
+    : [];
+
+  const totalPages = data?.totalPages ?? 0;
 
   const deleteMutation = useDeleteSiniestro();
   const assignAnalista = useAssignAnalista();
@@ -120,18 +136,51 @@ export const ListarSiniestros = () => {
   // 6. Feedback de carga / errores
   // -------------------------------
   if (artsLoading || analistasLoading || siniestrosLoading) {
-    return <p>Cargando datos…</p>;
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "60vh" }}
+      >
+        <div className="spinner-border text-warning" role="status">
+          <span className="visually-hidden">Cargando datos...</span>
+        </div>
+      </div>
+    );
   }
   if (artsError) {
-    return <p>Error al cargar lista de ART: {artsError.message}</p>;
+    return (
+      <div className="alert alert-danger m-5">
+        Error cargando ART: {artsError.message}
+      </div>
+    );
   }
   if (analistasError) {
-    return <p>Error al cargar lista de analistas: {analistasError.message}</p>;
+    return (
+      <div className="alert alert-danger m-5">
+        Error cargando analistas: {analistasError.message}
+      </div>
+    );
   }
   if (siniestrosError) {
-    return <p>Error al cargar siniestros: {siniestrosError.message}</p>;
+    return (
+      <div className="alert alert-danger m-5">
+        Error cargando siniestros: {siniestrosError.message}
+      </div>
+    );
   }
 
+  const handleOrderByDate = () => {
+    setSortDir((prev) => (prev === "desc" ? "asc" : "desc"));
+    // Resetear paginado al cambiar orden
+    setPage(0);
+  };
+  const handleLimpiarFiltros = () => {
+    setNumStroSearch("");
+    setInputNumStro("");
+    setSelectedArtId("");
+    setSelectedAnalistaId("");
+    setPage(0);
+  };
   // -------------------------------
   // 7. Renderizado de la vista
   // -------------------------------
@@ -140,39 +189,51 @@ export const ListarSiniestros = () => {
       {/* Barra superior: input de búsqueda y botón “Nuevo” */}
       <div className="d-flex justify-content-between align-items-center pt-5 flex-wrap">
         <div className="d-flex w-50 align-items-center gap-2">
+          <div className="mb-3 w-50" style={{ position: "relative" }}>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Ingresá el número de siniestro"
+              value={inputNumStro}
+              onKeyDown={manejarKeyDown}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*$/.test(value)) {
+                  // solo permite números
+                  setInputNumStro(value);
+                }
+              }}
+              pla
+              style={{ paddingRight: "2.5rem" }}
+            />
+            <img
+              src={Search}
+              onClick={handleSearchClick}
+              style={{
+                position: "absolute",
+                top: "50%",
+                right: "0.75rem",
+                cursor: "pointer",
+                transform: "translateY(-50%)",
+                color: "#6c757d",
+              }}
+            />
+          </div>
 
-      <div className="mb-3 w-50" style={{ position: 'relative' }}>
-  <input
-    type="text"
-    className="form-control"
-    placeholder="Ingresá el número de siniestro"
-    value={inputNumStro}
-    onKeyDown={manejarKeyDown}
-    
-    onChange={(e) => {
-      const value = e.target.value;
-      if (/^\d*$/.test(value)) { // solo permite números
-        setInputNumStro(value);
-      }
-    }}
-    pla
-    style={{ paddingRight: '2.5rem' }} 
-    />
-  <img src={Search}
-    onClick={handleSearchClick}
-    style={{
-      position: 'absolute',
-      top: '50%',
-      right: '0.75rem',
-      cursor: 'pointer',
-      transform: 'translateY(-50%)',
-      color: '#6c757d', 
-    }}
-    />
-</div>
-
-  {numStroSearch && <div className="mb-3"> <button className="text-warning bg-transparent border-0 p-0 m-0 shadow-none"ext-decoration-none onClick={()=> setNumStroSearch("")}>Quitar filtro</button><img src={Close} alt="" srcset="" /></div>}
-    </div>    
+          {(numStroSearch || selectedArtId || selectedAnalistaId) && (
+            <div className="mb-3">
+              {" "}
+              <button
+                className="text-warning bg-transparent border-0 p-0 m-0 shadow-none"
+                text-decoration-none
+                onClick={handleLimpiarFiltros}
+              >
+                Quitar filtros
+                <img src={Close} alt="" srcset="" />
+              </button>
+            </div>
+          )}
+        </div>
         <button
           className="btn btn-warning mb-3"
           onClick={() => navigate("/siniestros")}
@@ -186,11 +247,20 @@ export const ListarSiniestros = () => {
       <div className="table-responsive">
         <table className="table table-striped table-hover no-wrap">
           <thead
-            className={`${theme === "dark" ? "table-dark" : "table-light"} no-wrap`}
+            className={`${
+              theme === "dark" ? "table-dark" : "table-light"
+            } no-wrap`}
           >
             <tr>
               <th>Número Stro.</th>
-              <th>Fecha de Ingreso</th>
+              <th onClick={handleOrderByDate} style={{ cursor: "pointer" }}>
+                Fecha de Ingreso{" "}
+                {sortDir === "asc" ? (
+                  <VscArrowSmallUp size="1.8em" />
+                ) : (
+                  <VscArrowSmallDown size="1.8em" />
+                )}
+              </th>
               <th>Fecha de Vto.</th>
               <th>
                 <select
@@ -262,7 +332,9 @@ export const ListarSiniestros = () => {
                     <strong>{data.numStro}</strong>
                   </td>
                   <td className="fecha">{formatDate(data.fechaIngreso)}</td>
-                  <td className="fecha">{formatDate(data.fecha_vencimiento)}</td>
+                  <td className="fecha">
+                    {formatDate(data.fecha_vencimiento)}
+                  </td>
                   <td>{data.art?.nombreART || "Sin datos"}</td>
                   <td>{data.trabajador?.apellido || "Sin datos"}</td>
                   <td>{data.tipoStro || "Sin datos"}</td>
@@ -330,19 +402,61 @@ export const ListarSiniestros = () => {
             )}
           </tbody>
         </table>
-        <nav aria-label="Page navigation example">
-  <ul class="pagination justify-content-end">
-    <li class="page-item disabled">
-      <a class="page-link">Anterior</a>
-    </li>
-    <li class="page-item text-warning"><a class="page-link text-warning" href="#">1</a></li>
-    <li class="page-item text-warning"><a class="page-link text-warning" href="#">2</a></li>
-    <li class="page-item text-warning"><a class="page-link text-warning" href="#">3</a></li>
-    <li class="page-item text-warning">
-      <a class="page-link text-warning" href="#">Siguiente</a>
-    </li>
-  </ul>
-</nav>
+
+        <nav aria-label="Paginación">
+          <ul className="pagination pagination-sm justify-content-end">
+            {/* Anterior */}
+            <li className={`page-item ${page === 0 ? "disabled" : ""}`}>
+              <button
+                className={`page-link ${
+                  page !== 0 ? "border-warning text-warning" : ""
+                }`}
+                onClick={() => setPage(page - 1)}
+                disabled={page === 0}
+              >
+                Anterior
+              </button>
+            </li>
+
+            {/* Números de página */}
+            {[...Array(totalPages)].map((_, idx) => (
+              <li
+                key={idx}
+                className={`page-item ${page === idx ? "active" : ""}`}
+              >
+                <button
+                  className={`page-link ${
+                    page === idx
+                      ? "bg-warning border-warning text-dark"
+                      : "text-warning border-warning bg-transparent"
+                  }`}
+                  onClick={() => setPage(idx)}
+                >
+                  {idx + 1}
+                </button>
+              </li>
+            ))}
+
+            {/* Siguiente */}
+            <li
+              className={`page-item ${
+                page === totalPages - 1 ? "disabled" : ""
+              }`}
+            >
+              <button
+                className={`page-link ${
+                  page !== totalPages - 1
+                    ? "border-warning text-warning"
+                    : ""
+                }`}
+                onClick={() => setPage(page + 1)}
+                disabled={page === totalPages - 1}
+              >
+                Siguiente
+              </button>
+            </li>
+          </ul>
+        </nav>
       </div>
 
       {/* Modal de confirmación */}

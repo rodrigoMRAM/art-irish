@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const fetchSiniestros = async (
   token,
-  { numStro, artId, analistaId, tipoStro, tipoInvestigacion, resultado } = {}
+  { numStro, artId, analistaId, tipoStro, tipoInvestigacion, resultado, sortDir, size, page } = {}
 ) => {
   let url;
 
@@ -30,11 +30,20 @@ const fetchSiniestros = async (
     if (resultado != null && resultado !== "") {
       queryParams.set("resultado", resultado);
     }
+    if (sortDir != null && sortDir !== "") {
+      queryParams.set("sortDir", sortDir);
+    }
+    if (size != null && size !== "") {
+      queryParams.set("size", size);
+    }
+    if (page != null && page !== "") {
+      queryParams.set("page", page);
+    }
 
     url =
       queryParams.toString().length > 0
         ? `${API_URL}/siniestros?${queryParams.toString()}`
-        : `${API_URL}/siniestros`;
+        : `${API_URL}/siniestros?size=5`;
   }
 
   const res = await fetch(url, {
@@ -118,13 +127,16 @@ export const useSiniestros = ({
   tipoStro,
   tipoInvestigacion,
   resultado,
+  sortDir,
+  size,
+  page,
 } = {}) => {
   const token = useSelector((state) => state.user.jwt);
 
   return useQuery({
     queryKey: [
       "siniestros",
-      { numStro, artId, analistaId, tipoStro, tipoInvestigacion, resultado },
+      { numStro, artId, analistaId, tipoStro, tipoInvestigacion, resultado, sortDir, size, page },
     ],
     queryFn: () =>
       fetchSiniestros(token, {
@@ -134,6 +146,9 @@ export const useSiniestros = ({
         tipoStro,
         tipoInvestigacion,
         resultado,
+        sortDir,
+        size,
+        page,
       }),
     staleTime: 1000 * 60 * 2,
   });

@@ -28,7 +28,11 @@ export const Resumen = () => {
       <div className="container mt-5 text-center">
         <Card className="p-4">
           <h4>No se encontraron datos del siniestro.</h4>
-          <Button variant="warning" onClick={() => navigate(-1)} className="mt-3">
+          <Button
+            variant="warning"
+            onClick={() => navigate(-1)}
+            className="mt-3"
+          >
             Volver
           </Button>
         </Card>
@@ -42,11 +46,9 @@ export const Resumen = () => {
   return (
     <div className="container mt-5">
       <Card className="col-10 p-4 mx-auto mt-5 shadow">
-        
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div className="fs-2">
-            | Estudio{" "}
-            <strong className="text-warning">Irish</strong> |
+            | Estudio <strong className="text-warning">Irish</strong> |
           </div>
           <h5>RESUMEN</h5>
         </div>
@@ -57,9 +59,15 @@ export const Resumen = () => {
               <strong className="text-warning">SINIESTRO:</strong>{" "}
               {mostrar(formData.numStro)}
             </p>
-             <p>
+            <p>
               <strong className="text-warning">Cliente (ART):</strong>{" "}
-              {`${mostrar(art.nombreART)}${art.nombreAnalista ? ` (${mostrar(art.nombreAnalista)} ${mostrar(art.apellidoAnalista)})` : ''}`}
+              {`${mostrar(art.nombreART)}${
+                art.nombreAnalista
+                  ? ` (${mostrar(art.nombreAnalista)} ${mostrar(
+                      art.apellidoAnalista
+                    )})`
+                  : ""
+              }`}
             </p>
           </div>
           <div className="text-end">
@@ -71,7 +79,6 @@ export const Resumen = () => {
               <strong className="text-warning">Fecha de Vto:</strong>{" "}
               {mostrarFecha(formData.fecha_vencimiento)}
             </p>
-           
           </div>
         </div>
 
@@ -138,35 +145,52 @@ export const Resumen = () => {
         {/* Sección: Lugar del Hecho */}
         <h2 className="mt-4">Datos del siniestro</h2>
         <hr />
-        <div className="mb-3">
-          <p>
-            <strong className="text-warning">Dirección:</strong>{" "}
-            {mostrar(formData.lugar_direccion)}
-          </p>
-          <p>
-            <strong className="text-warning">Entre Calles:</strong>{" "}
-            {mostrar(formData.lugar_entrecalles)}
-          </p>
-          <p>
-            <strong className="text-warning">Localidad:</strong>{" "}
-            {mostrar(formData.localidad)}
-          </p>
-          <p>
-            <strong className="text-warning">Provincia:</strong>{" "}
-            {mostrar(formData.provincia)}
-          </p>
+        <div className="d-flex justify-content-between mb-3 flex-wrap">
+          <div className="col-md-4 mb-3">
+            <h4 className="mt-4">Fecha y hora del hecho:</h4> <br />
+            <p>
+              <strong className="text-warning">Fecha del Hecho:</strong>{" "}
+              {mostrarFecha(
+                formData.fechaYHoraStro
+                  ? formData.fechaYHoraStro.split("T")[0]
+                  : ""
+              )}
+            </p>
+            <p>
+              <strong className="text-warning">Hora del Hecho:</strong>{" "}
+              {formData.fechaYHoraStro
+                ? formData.fechaYHoraStro.split("T")[1]?.slice(0, 5)
+                : mostrar(formData.horaYHoraStro)}
+            </p>
+          </div>
+
+          <div className="mb-3">
+            <h4 className="mt-4">Lugar del hecho:</h4> <br />
+            <p>
+              <strong className="text-warning">Dirección:</strong>{" "}
+              {mostrar(formData.lugar_direccion)}
+            </p>
+            <p>
+              <strong className="text-warning">Entre Calles:</strong>{" "}
+              {mostrar(formData.lugar_entrecalles)}
+            </p>
+            <p>
+              <strong className="text-warning">Localidad:</strong>{" "}
+              {mostrar(formData.localidad)}
+            </p>
+            <p>
+              <strong className="text-warning">Provincia:</strong>{" "}
+              {mostrar(formData.provincia)}
+            </p>
+          </div>
         </div>
         <h2 className="mt-4">Mecánica del Hecho:</h2>
         <hr />
         <Card className="mb-4">
           <Card.Body>
-            {formData.mechanicaHecho
-              ? formData.mechanicaHecho
-              : "Sin datos"}
+            {formData.mechanicaHecho ? formData.mechanicaHecho : "Sin datos"}
           </Card.Body>
         </Card>
-
-        {/* Sección: Detalles */}
         <h2 className="mt-4">Otros detalles</h2>
         <hr />
         <div className="row">
@@ -209,9 +233,7 @@ export const Resumen = () => {
         <hr />
         <Card className="mb-4">
           <Card.Body>
-            {formData.observaciones
-              ? formData.observaciones
-              : "Sin datos"}
+            {formData.observaciones ? formData.observaciones : "Sin datos"}
           </Card.Body>
         </Card>
 
