@@ -1,18 +1,29 @@
-import React, { useState, useEffect } from "react";
-import {
-  useSiniestros,
-  useCrearSiniestro,
-  useDeleteSiniestro,
-  useUpdateSiniestro,
-  useAssignAnalista,
-} from '../hooks/useSiniestro'; // ajusta el path según tu estructura
-import { ToastContainer, toast } from 'react-toastify';
+import React, { useState, useRef, useEffect } from "react";
+import { useCrearSiniestro } from "../hooks/useSiniestro";
+import { ToastContainer, toast } from "react-toastify";
 import { useTheme } from "../utils/ThemeState";
-
-import { useArts, useDeleteArt, useUpdateArt } from "../hooks/useGetArt";
+import { useArts } from "../hooks/useGetArt";
 import { useCreateTrabajador } from "../hooks/useCreateTrabajador";
 
 const initialFormData = {
+  numStro: "",
+  fechaYHoraStro: "",
+  artId: "",
+  tipoStro: "",
+  lugar_direccion: "",
+  lugar_entrecalles: "",
+  localidad: "",
+  provincia: "",
+  mechanicaHecho: "",
+  gravedad: "",
+  tipoInvestigacion: "",
+  nombrePrestadorMedico: "",
+  lesiones: "",
+  patologiasInculpables: "",
+  observaciones: "",
+};
+
+const initialTrabajador = {
   dni: "",
   nombre: "",
   apellido: "",
@@ -29,574 +40,546 @@ const initialFormData = {
 };
 
 export const CargarSiniestro = () => {
-  const { data: arts = [], isLoading, error : errorart } = useArts();
+  const {
+    data: arts = [],
+    isLoading: artsLoading,
+    error: artsError,
+  } = useArts();
   const { mutateAsync: createTrabajador } = useCreateTrabajador();
-  const { mutate, isLoading: loading , error, success} = useCrearSiniestro();
-  
-
+  const { mutate: createSiniestro, isLoading: loading } = useCrearSiniestro();
   const { theme } = useTheme();
-  const [formData, setFormData] = useState({
-    numStro: "",
-    fechaYHoraStro: "",
-    tipoInvestigacion: "",
-    lugar_direccion: "",
-    lugar_entrecalles: "",
-    localidad: "",
-    provincia: "",
-    mechanicaHecho: "",
-    gravedad: "",
-    nombrePrestadorMedico: "",
-    lesiones: "",
-    patologiasInculpables: "",
-    tipoStro: "",
-    resultado: "",
-    tieneRecupero: true,
-    observaciones: "",
-    artId: null,
-    trabajadorId: "",
-  });
-  const [formDataTrabajador, setFormDataTrabajador] = useState(initialFormData);
+
+  const [formData, setFormData] = useState(initialFormData);
+  const [trabajadorData, setTrabajadorData] = useState(initialTrabajador);
+  const [validated, setValidated] = useState(false);
+  const formRef = useRef(null);
+
+  // Reset validation when modal/form mounts
+  useEffect(() => {
+    setValidated(false);
+    formRef.current?.classList.remove("was-validated");
+  }, []);
+
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [id]: type === "checkbox" ? checked : value,
-    });
-    setFormDataTrabajador({
-      ...formDataTrabajador,
-      [id]: type === "checkbox" ? checked : value,
-    });
+    const val = type === "checkbox" ? checked : value;
+
+    if (id.startsWith("trabajador_")) {
+      const key = id.replace("trabajador_", "");
+      setTrabajadorData((prev) => ({
+        ...prev,
+        [key]: val,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [id]: val,
+      }));
+    }
   };
 
-// console.log(formData)
-const handleSubmit = (e) => {
-  e.preventDefault();
-
-  createTrabajador(formDataTrabajador, {
-    onSuccess: (trabajadorCreado) => {
-      const idTrabajador = trabajadorCreado.id;
-
-      const payload = {
-        formData: {
-          ...formData,
-          trabajadorId:  idTrabajador, // Asignar el ID del trabajador creado,
-        }
-      };
-
-      mutate(payload, {
-        onSuccess: () => {
-          toast.success('Siniestro creado correctamente');
-          setFormData({
-            numStro: "",
-            fechaYHoraStro: "",
-            tipoInvestigacion: "",
-            lugar_direccion: "",
-            lugar_entrecalles: "",
-            localidad: "",
-            provincia: "",
-            mechanicaHecho: "",
-            gravedad: "",
-            nombrePrestadorMedico: "",
-            lesiones: "",
-            patologiasInculpables: "",
-            tipoStro: "",
-            resultado: "",
-            tieneRecupero: true,
-            observaciones: "",
-            artId: null,
-            trabajadorId: "",
-            aseguradoId: "",  
-          });
-          setFormDataTrabajador(initialFormData);
-        },
-        onError: () => {
-          toast.error('Error al crear el siniestro');
-        }
-      });
-    },
-    onError: () => {
-      toast.error('Error al crear el trabajador');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const form = formRef.current;
+    if (!form.checkValidity()) {
+      setValidated(true);
+      return;
     }
-  });
-};
+    // Crear trabajador primero
+    try {
+      const trabajador = await createTrabajador(trabajadorData);
+      createSiniestro({
+        formData: { ...formData, trabajadorId: trabajador.id },
+      });
+      toast.success("Siniestro y trabajador creados con éxito");
+      // resetear todo
+      setFormData(initialFormData);
+      setTrabajadorData(initialTrabajador);
+      setValidated(false);
+      form.classList.remove("was-validated");
+    } catch (err) {
+      toast.error("Ocurrió un error: " + err.message);
+    }
+  };
 
-
+  if (artsLoading) {
+    return (
+      <div className="d-flex justify-content-center mt-5">
+        <div className="spinner-border text-warning" role="status" />
+      </div>
+    );
+  }
+  if (artsError) {
+    return (
+      <div className="alert alert-danger mt-5">
+        Error al cargar lista de ART: {artsError.message}
+      </div>
+    );
+  }
 
   return (
     <main className="mt-5 p-5 col-lg-9 m-auto">
-      <div>
-        
-        <h2 className="my-3">Cargar nuevo Siniestro</h2>
+      <h2 className="my-3">Cargar nuevo Siniestro</h2>
+      <form
+        ref={formRef}
+        className={`row g-3 needs-validation ${
+          validated ? "was-validated" : ""
+        }`}
+        noValidate
+        onSubmit={handleSubmit}
+      >
+        {/* DATOS SINIESTRO */}
+        <div className="col-md-4">
+          <label htmlFor="numStro" className="form-label dark-mode">
+            Número de Stro.
+          </label>
+          <input
+            type="number"
+            className="form-control"
+            id="numStro"
+            value={formData.numStro}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (/^\d{0,9}$/.test(val)) {
+                handleChange(e);
+              }
+            }}
+            placeholder="Ej: 12345678"
+            required
+          />
+          <div className="invalid-feedback">Ingrese número de siniestro.</div>
+        </div>
+        <div className="col-md-4">
+          <label htmlFor="fechaYHoraStro" className="form-label dark-mode">
+            Fecha y hora de siniestro
+          </label>
+          <input
+            type="datetime-local"
+            className="form-control"
+            id="fechaYHoraStro"
+            max={new Date().toISOString().slice(0, 16)}
+            value={formData.fechaYHoraStro}
+            onChange={handleChange}
+            required
+          />
+          <div className="invalid-feedback">Seleccione fecha y hora.</div>
+        </div>
+        <div className="col-md-4">
+          <label htmlFor="artId" className="form-label dark-mode">
+            Cliente (ART)
+          </label>
+          <select
+            id="artId"
+            className="form-select"
+            value={formData.artId}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccione</option>
+            {arts.map((art) => (
+              <option key={art.idART} value={art.idART}>
+                {art.nombreART}
+              </option>
+            ))}
+          </select>
+          <div className="invalid-feedback">Seleccione una ART.</div>
+        </div>
 
-        <p className="mb-0 text-danger"></p>
-        <form className="row g-3" onSubmit={handleSubmit}>
-          <div className="col-md-4">
-            <label htmlFor="numStro" className="form-label dark-mode">
-              Número de Stro.
+        <hr className="mt-4" />
+        <h4 className="text-warning">Datos del Trabajador</h4>
+
+        {/* DATOS TRABAJADOR */}
+        {[
+          {
+            id: "trabajador_dni",
+            stateKey: "dni",
+            label: "DNI",
+            placeholder: "12345678",
+            type: "number",
+            required: true,
+          },
+          {
+            id: "trabajador_nombre",
+            stateKey: "nombre",
+            label: "Nombre",
+            placeholder: "Juan",
+            type: "text",
+            required: true,
+          },
+          {
+            id: "trabajador_apellido",
+            stateKey: "apellido",
+            label: "Apellido",
+            placeholder: "Pérez",
+            type: "text",
+            required: true,
+          },
+          {
+            id: "trabajador_telefono",
+            stateKey: "telefono",
+            label: "Teléfono",
+            placeholder: "01123456789",
+            type: "tel",
+            required: false,
+          },
+          {
+            id: "trabajador_telefono2",
+            stateKey: "telefono2",
+            label: "Teléfono 2 (opcional)",
+            placeholder: "01123456789",
+            type: "tel",
+            required: false,
+          },
+          {
+            id: "trabajador_email",
+            stateKey: "email",
+            label: "Email",
+            placeholder: "ejemplo@correo.com",
+            type: "email",
+            required: true,
+          },
+          {
+            id: "trabajador_calle",
+            stateKey: "calle",
+            label: "Calle",
+            placeholder: "Córdoba",
+            type: "text",
+            required: true,
+          },
+          {
+            id: "trabajador_numero",
+            stateKey: "numero",
+            label: "Número",
+            placeholder: "1234",
+            type: "text",
+            required: true,
+          },
+          {
+            id: "trabajador_piso",
+            stateKey: "piso",
+            label: "Piso",
+            placeholder: "1",
+            type: "text",
+            required: true,
+          },
+          {
+            id: "trabajador_depto",
+            stateKey: "depto",
+            label: "Departamento",
+            placeholder: "A",
+            type: "text",
+            required: true,
+          },
+          {
+            id: "trabajador_cp",
+            stateKey: "cp",
+            label: "Código Postal",
+            placeholder: "1234",
+            type: "number",
+            required: true,
+          },
+          {
+            id: "trabajador_localidad",
+            stateKey: "localidad",
+            label: "Localidad",
+            placeholder: "Avellaneda",
+            type: "text",
+            required: true,
+          },
+          {
+            id: "trabajador_provincia",
+            stateKey: "provincia",
+            label: "Provincia",
+            placeholder: "Buenos Aires",
+            type: "text",
+            required: true,
+          },
+        ].map(({ id, stateKey, label, placeholder, type, required }) => (
+          <div className="col-md-3" key={id}>
+            <label htmlFor={id} className="form-label dark-mode">
+              {label}
             </label>
             <input
-              type="number"
+              type={type}
               className="form-control"
-              id="numStro"
-              value={formData.numStro}
+              id={id}
+              placeholder={`Ej: ${placeholder}`}
+              value={trabajadorData[stateKey] || ""}
               onChange={handleChange}
-              placeholder="Ej: 12345678"
-              required
+              required={required}
             />
+            {required && (
+              <div className="invalid-feedback">
+                {`Ingrese ${label.toLowerCase()}.`}
+              </div>
+            )}
           </div>
-          <div className="col-md-4 mb-3">
-            <label htmlFor="fechaYHoraStro" className="form-label dark-mode">
-              Fecha y hora de siniestro
-            </label>
-            <input
-              type="datetime-local"
-              className="form-control"
-              id="fechaYHoraStro"
-              value={formData.fechaYHoraStro}
-              onChange={handleChange}
-              max={new Date().toISOString().slice(0, 16)}
-            />
-          </div>
-          <div className="col-md-4">
-  <label htmlFor="tipoInvestigacion" className="form-label dark-mode">
-    Cliente
-  </label>
-  <select
-    id="artId"
-    className="form-select"
-    value={formData.artId}
-    onChange={handleChange}
-    name="artId"
-  >
-    <option value="">Seleccione</option>
+        ))}
 
-    {arts.map((art) => (
-      <option key={art.idART} value={art.idART}>
-        {art.nombreART}
-      </option>
-    ))}
-  </select> 
+        {/* UBICACIÓN HECHO */}
+        <hr className="mt-4" />
+        <h4 className="text-warning">Ubicación del hecho</h4>
 
+        <div className="col-md-3">
+          <label htmlFor="lugar_direccion" className="form-label dark-mode">
+            Dirección
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            id="lugar_direccion"
+            placeholder="Ej: Córdoba 1000"
+            value={formData.lugar_direccion}
+            onChange={handleChange}
+            maxLength={50}
+            required
+          />
+          <div className="invalid-feedback">Ingrese dirección.</div>
+        </div>
+        <div className="col-md-3">
+          <label htmlFor="lugar_entre_calles" className="form-label dark-mode">
+            Entre Calles
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            id="lugar_entrecalles"
+            placeholder="Ej: Córdoba y San Martín"
+            value={formData.lugar_entrecalles}
+            onChange={handleChange}
+            maxLength={70}
+            required
+          />
+          <div className="invalid-feedback">Ingrese entre calles.</div>
+        </div>
+        <div className="col-md-3">
+          <label htmlFor="localidad" className="form-label dark-mode">
+            Localidad
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            id="localidad"
+            placeholder="Ej: Avellaneda"
+            value={formData.localidad}
+            onChange={handleChange}
+            maxLength={30}
+            required
+          />
+          <div className="invalid-feedback">Ingrese localidad.</div>
+        </div>
+        <div className="col-md-3">
+          <label htmlFor="provincia" className="form-label dark-mode">
+            Provincia
+          </label>
+          <select
+            id="provincia"
+            className="form-select"
+            value={formData.provincia}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccione</option>
+            <option>Buenos Aires</option>
+            <option>CABA</option>
+            <option>Catamarca</option>
+            <option>Chubut</option>
+            <option>Santa Fe</option>
+            <option>Córdoba</option>
+            <option>Entre Ríos</option>
+            <option>Mendoza</option>
+            <option>San Juan</option>
+            <option>San Luis</option>
+            <option>La Rioja</option>
+            <option>Salta</option>
+            <option>Jujuy</option>
+            <option>Corrientes</option>
+            <option>Santiago del Estero</option>
+            <option>Neuquén</option>
+            <option>Río Negro</option>
+            <option>Formosa</option>
+            <option>Chaco</option>
+            <option>Misiones</option>
+            <option>La Pampa</option>
+            <option>Santa Cruz</option>
+            <option>Tucumán</option>
+            <option>Tierra del Fuego</option>
+          </select>
+          <div className="invalid-feedback">Seleccione provincia.</div>
+        </div>
 
+        {/* DETALLES */}
+        <hr className="mt-4" />
+        <h4 className="text-warning">Detalles del accidente</h4>
 
-</div>
-   {/* ESPACION */}
- <hr />
-          <h4 className="my-3 text-warning ">Datos del trabajador</h4>
-          <div className="col-md-3">
-  <label htmlFor="dni" className="form-label dark-mode">DNI</label>
-  <input
-    type="number"
-    className="form-control"
-    id="dni"
-    value={formDataTrabajador.dni}
-    onChange={handleChange}
-    placeholder="Ej: 33874652"
-    required
-  />
-</div>
-<div className="col-md-3">
-  <label htmlFor="nombre" className="form-label dark-mode">Nombre</label>
-  <input
-    type="text"
-    className="form-control"
-    id="nombre"
-    value={formDataTrabajador.nombre}
-    onChange={handleChange}
-    placeholder="Ej: Matias"
-    required
-  />
-</div>
-<div className="col-md-3">
-  <label htmlFor="apellido" className="form-label dark-mode">Apellido</label>
-  <input
-    type="text"
-    className="form-control"
-    id="apellido"
-    value={formDataTrabajador.apellido}
-    onChange={handleChange}
-    placeholder="Ej: Martinez"
-    required
-  />
-</div>
-<div className="col-md-3">
-  <label htmlFor="telefono" className="form-label dark-mode">Teléfono</label>
-  <input
-    type="tel"
-    className="form-control"
-    id="telefono"
-    value={formDataTrabajador.telefono}
-    onChange={handleChange}
-    placeholder="Ej: 11567812123"
-  />
-</div>
-<div className="col-md-3">
-  <label htmlFor="telefono2" className="form-label dark-mode">Teléfono 2 (opcional)</label>
-  <input
-    type="tel"
-    className="form-control"
-    id="telefono2"
-    value={formDataTrabajador.telefono2}
-    onChange={handleChange}
-    placeholder="Ej: 1167894222"
-  />
-</div>
-<div className="col-md-4">
-  <label htmlFor="email" className="form-label dark-mode">Email</label>
-  <input
-    type="email"
-    className="form-control"
-    id="email"
-    value={formDataTrabajador.email}
-    onChange={handleChange}
-    placeholder="Ej: matias@email.com"
-  />
-</div>
-<div className="col-md-4">
-  <label htmlFor="calle" className="form-label dark-mode">Calle</label>
-  <input
-    type="text"
-    className="form-control"
-    id="calle"
-    value={formDataTrabajador.calle}
-    onChange={handleChange}
-    placeholder="Ej: Av. Republica"
-  />
-</div>
-{/* <div className="col-md-4">
-  <label htmlFor="calle" className="form-label dark-mode">Entre calles</label>
-  <input
-    type="text"
-    className="form-control"
-    id="calle"
-    value={formDataTrabajador.calle}
-    onChange={handleChange}
-    placeholder="Ej: Av. Republica"
-  />
-</div> */}
-<div className="col-md-2">
-  <label htmlFor="numero" className="form-label dark-mode">Número</label>
-  <input
-    type="number"
-    className="form-control"
-    id="numero"
-    value={formDataTrabajador.numero}
-    onChange={handleChange}
-    placeholder="Ej: 989"
-  />
-</div>
-<div className="col-md-2">
-  <label htmlFor="piso" className="form-label dark-mode">Piso</label>
-  <input
-    type="text"
-    className="form-control"
-    id="piso"
-    value={formDataTrabajador.piso}
-    onChange={handleChange}
-    placeholder="Ej: 4"
-  />
-</div>
-<div className="col-md-2">
-  <label htmlFor="depto" className="form-label dark-mode">Depto</label>
-  <input
-    type="text"
-    className="form-control"
-    id="depto"
-    value={formDataTrabajador.depto}
-    onChange={handleChange}
-    placeholder="Ej: C"
-  />
-</div>
-<div className="col-md-2">
-  <label htmlFor="cp" className="form-label dark-mode">Código Postal</label>
-  <input
-    type="number"
-    className="form-control"
-    id="cp"
-    value={formDataTrabajador.cp}
-    onChange={handleChange}
-    placeholder="Ej: 8000"
-  />
-</div>
-<div className="col-md-3">
-  <label htmlFor="localidad" className="form-label dark-mode">Localidad</label>
-  <input
-    type="text"
-    className="form-control"
-    id="localidad"
-    value={formDataTrabajador.localidad}
-    onChange={handleChange}
-    placeholder="Ej: Bahía Blanca"
-  />
-</div>
-<div className="col-md-3">
-  <label htmlFor="provincia" className="form-label dark-mode">Provincia</label>
-  <input
-    type="text"
-    className="form-control"
-    id="provincia1"
-    value={formDataTrabajador.provincia}
-    onChange={handleChange}
-    placeholder="Ej: Buenos Aires"
-  />
-</div>
+        <div className="col-md-4">
+          <label htmlFor="tipoSiniestro" className="form-label dark-mode">
+            Tipo de siniestro
+          </label>
+          <select
+            id="tipoStro"
+            className="form-select"
+            value={formData.tipoStro}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccione</option>
+            <option value="In Itínere">In Itínere</option>
+            <option value="Laboral">Laboral</option>
+          </select>
+          <div className="invalid-feedback">Ingrese tipo de siniestro.</div>
+        </div>
+        <div className="col-md-4">
+          <label htmlFor="gravedad" className="form-label dark-mode">
+            Gravedad
+          </label>
+          <select
+            id="gravedad"
+            className="form-select"
+            value={formData.gravedad}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccione</option>
+            <option value="Leve">Leve</option>
+            <option value="Moderado">Moderado</option>
+            <option value="Grave">Grave</option>
+            <option value="ROAM">ROAM</option>
+            <option value="Mortal">Mortal</option>
+          </select>
+          <div className="invalid-feedback">Seleccione gravedad.</div>
+        </div>
+        <div className="col-md-4">
+          <label htmlFor="tipoInvestigacion" className="form-label dark-mode">
+            Tipo de investigación
+          </label>
+          <select
+            id="tipoInvestigacion"
+            className="form-select"
+            value={formData.tipoInvestigacion}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccione</option>
+            <option value="In Situ">In Situ</option>
+            <option value="Mixta">Mixta</option>
+            <option value="Virtual">Virtual</option>
+          </select>
+          <div className="invalid-feedback">
+            Seleccione tipo de investigación.
+          </div>
+        </div>
 
+        <div className="col-12">
+          <label htmlFor="mechanicaHecho" className="form-label dark-mode">
+            Mecánica del hecho
+          </label>
+          <textarea
+            className="form-control"
+            id="mechanicaHecho"
+            rows="3"
+            placeholder="Describa la mecánica..."
+            value={formData.mechanicaHecho}
+            onChange={handleChange}
+            required
+          />
+          <div className="invalid-feedback">
+            Describa la mecánica del hecho.
+          </div>
+        </div>
+        {/* DETALLES */}
+        <hr className="mt-4" />
+        <h4 className="text-warning">Otros datos</h4>
 
+        <div className="col-md-4">
+          <label
+            htmlFor="nombrePrestadorMedico"
+            className="form-label dark-mode"
+          >
+            Prestador Médico
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            id="nombrePrestadorMedico"
+            placeholder="Ej: Galeno"
+            value={formData.nombrePrestadorMedico}
+            onChange={handleChange}
+            required
+          />
+          <div className="invalid-feedback">
+            Ingrese nombre del prestador médico.
+          </div>
+        </div>
+        <div className="col-md-4">
+          <label htmlFor="lesiones" className="form-label dark-mode">
+            Lesiones
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            id="lesiones"
+            placeholder="Ej: Fractura de brazo"
+            value={formData.lesiones}
+            onChange={handleChange}
+            required
+          />
+          <div className="invalid-feedback">Ingrese tipo de lesiones.</div>
+        </div>
+        <div className="col-md-4">
+          <label
+            htmlFor="patologiasInculpables"
+            className="form-label dark-mode"
+          >
+            Patologías Inculpables
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            id="patologiasInculpables"
+            placeholder="Ej: Hipertensión"
+            value={formData.patologiasInculpables}
+            onChange={handleChange}
+            required
+          />
+          <div className="invalid-feedback">
+            Ingrese patologías inculpables.
+          </div>
+        </div>
 
+        <div className="col-12">
+          <label htmlFor="observaciones" className="form-label dark-mode">
+            Observaciones
+          </label>
+          <textarea
+            className="form-control"
+            id="observaciones"
+            rows="2"
+            placeholder="observaciones..."
+            value={formData.observaciones}
+            onChange={handleChange}
+          />
+          <div className="invalid-feedback">Describa las observaciones.</div>
+        </div>
 
-          {/* ESPACION */}
+        {/* BOTÓN */}
+        <hr className="mt-4" />
+        <div className="col-12">
+          <button
+            type="submit"
+            className="btn btn-warning float-end"
+            disabled={loading}
+          >
+            {loading ? "Cargando..." : "Cargar Siniestro"}
+          </button>
+        </div>
+      </form>
 
-          <hr />
-          <h4 className="my-3 text-warning ">Lugar y descripción del hecho</h4>
-          <div className="col-md-4">
-            <label htmlFor="lugar_direccion" className="form-label dark-mode">
-              Lugar del hecho (Direccion)
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="lugar_direccion"
-              value={formData.lugar_direccion}
-              onChange={handleChange}
-              placeholder="Ej: Cordoba 1000"
-              required
-            />
-          </div>
-          <div className="col-md-3">
-            <label htmlFor="lugar_entrecalles" className="form-label dark-mode">
-              Entre calles
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="lugar_entrecalles"
-              value={formData.lugar_entrecalles}
-              onChange={handleChange}
-              placeholder="Entre Calles"
-            />
-          </div>
-          <div className="col-md-3">
-            <label htmlFor="localidad" className="form-label dark-mode">
-              Localidad
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="localidad"
-              value={formData.localidad}
-              onChange={handleChange}
-              placeholder="Ej: Avellaneda"
-              required
-            />
-          </div>
-          <div className="col-md-2">
-            <label htmlFor="provincia" className="form-label dark-mode">
-              Provincia
-            </label>
-            <select
-              id="provincia"
-              className="form-select"
-              value={formData.provincia}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Seleccione</option>
-              <option value="Buenos Aires">Buenos Aires</option>
-              <option value="Neuquén">Neuquén</option>
-              <option value="Santa Fe">Santa Fe</option>
-              <option value="La Pampa">La Pampa</option>
-              <option value="Tucuman">Tucumán</option>
-              <option value="Corrientes">Corrientes</option>
-              <option value="Mendoza">Mendoza</option>
-              <option value="La Rioja">La Rioja</option>
-              <option value="Chaco">Chaco</option>
-              <option value="Cordoba">Córdoba</option>
-              <option value="Salta">Salta</option>
-              <option value="Jujuy">Jujuy</option>
-            </select>
-          </div>
-          <div className="mb-3">
-            <label htmlFor="mechanicaHecho" className="form-label dark-mode">
-              Mecánica del Hecho
-            </label>
-            <textarea
-              className="form-control"
-              id="mechanicaHecho"
-              rows="3"
-              value={formData.mechanicaHecho}
-              onChange={handleChange}
-              placeholder="Describa la mecánica de los hechos..."
-              required
-            ></textarea>
-          </div>
-          <hr />
-          <h4 className="my-3 text-warning">Otros detalles</h4>
-          <div className="col-md-2">
-            <label htmlFor="gravedad" className="form-label dark-mode">
-              Gravedad
-            </label>
-            <select
-              id="gravedad"
-              className="form-select"
-              value={formData.gravedad}
-              onChange={handleChange}
-              required
-            >
-              <option value="0">Seleccione</option>
-              <option value="Leve">Leve</option>
-              <option value="Moderado">Moderado</option>
-              <option value="Grave">Grave</option>
-              <option value="ROAM">ROAM</option>
-              <option value="Mortal">Mortal</option>
-            </select>
-          </div>
-          <div className="col-md-3">
-            <label htmlFor="tipoInvestigacion" className="form-label dark-mode">
-              Tipo de Investigación
-            </label>
-            <select
-              id="tipoInvestigacion"
-              className="form-select"
-              value={formData.tipoInvestigacion}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Seleccione</option>
-              <option value="Tipo 1">In Situ</option>
-              <option value="Tipo 2">Mixta</option>
-              <option value="Tipo 2">Virtual</option>
-            </select>
-          </div>
-          <div className="col-md-3">
-            <label
-              htmlFor="nombrePrestadorMedico"
-              className="form-label dark-mode"
-            >
-              Prestador Médico
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="nombrePrestadorMedico"
-              value={formData.nombrePrestadorMedico}
-              onChange={handleChange}
-              placeholder="Ej: Galeno"
-              required
-            />
-          </div>
-          <div className="col-md-4">
-            <label htmlFor="lesiones" className="form-label dark-mode">
-              Lesiones
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="lesiones"
-              value={formData.lesiones}
-              onChange={handleChange}
-              placeholder="Ingrese Lesiones"
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label
-              htmlFor="patologiasInculpables"
-              className="form-label dark-mode"
-            >
-              Patologías Inculpables
-            </label>
-            <textarea
-              className="form-control"
-              id="patologiasInculpables"
-              rows="3"
-              value={formData.patologiasInculpables}
-              onChange={handleChange}
-              placeholder="Ingrese patologías Inculpables..."
-            ></textarea>
-          </div>
-          <div className="col-md-5">
-            <label htmlFor="tipoStro" className="form-label dark-mode">
-              Tipo de Siniestro
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="tipoStro"
-              value={formData.tipoStro}
-              onChange={handleChange}
-              placeholder="Ingrese el tipo de Siniestro"
-              required
-            />
-          </div>
-          {/* <div className="col-md-7">
-            <label htmlFor="resultado" className="form-label dark-mode">
-              Resultado
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="resultado"
-              value={formData.resultado}
-              onChange={handleChange}
-              placeholder="Ingrese el resultado"
-            />
-          </div> */}
-          {/* <div className="form-check form-switch col-md-4 mx-2">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              role="switch"
-              id="tieneRecupero"
-              checked={formData.tieneRecupero}
-              onChange={handleChange}
-            />
-            <label
-              className="form-check-label  dark-mode"
-              htmlFor="tieneRecupero"
-            >
-              Tiene Recupero
-            </label>
-          </div> */}
-          <hr />
-          <h4 className="text-warning">Observaciones</h4>
-          <div className="mb-3">
-            <label
-              htmlFor="observaciones"
-              className="form-label dark-mode"
-            ></label>
-            <textarea
-              className="form-control"
-              id="observaciones"
-              rows="1"
-              value={formData.observaciones}
-              onChange={handleChange}
-              placeholder="Ingrese observaciones... (opcional)"
-            ></textarea>
-          </div>
-          <div className="col-12">
-            <button type="submit" className="btn btn-warning px-3 float-end">
-              {loading ? "Cargando..." : "Cargar Siniestro"}
-            </button>
-          </div>
-          
-          {success ? (
-            <p className="text-success">Siniestro creado con exito</p>
-          ) : (
-            ""
-          )}
-        </form>
-      </div>
       <ToastContainer
-               position="bottom-right"
-               autoClose={1500}
-               hideProgressBar={false}
-               newestOnTop={false}
-               closeOnClick
-               pauseOnFocusLoss
-               draggable
-               pauseOnHover
-               theme={theme === "dark" ? "dark" : "light"}
-             />
+        position="bottom-right"
+        autoClose={3000}
+        theme={theme === "dark" ? "dark" : "light"}
+      />
     </main>
   );
 };
