@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { useTheme } from "../utils/ThemeState";
 import { useArts } from "../hooks/useGetArt";
 import { useCreateTrabajador } from "../hooks/useCreateTrabajador";
+import { useDeleteTrabajador } from "../hooks/useDeleteTrabajador"; // asegurate de tener este hook
 
 const initialFormData = {
   numStro: "",
@@ -46,7 +47,9 @@ export const CargarSiniestro = () => {
     error: artsError,
   } = useArts();
   const { mutateAsync: createTrabajador } = useCreateTrabajador();
-  const { mutate: createSiniestro, isLoading: loading } = useCrearSiniestro();
+  const { mutateAsync: createSiniestro, isLoading: loading } = useCrearSiniestro();
+  const { mutateAsync: deleteTrabajador } = useDeleteTrabajador();
+
   const { theme } = useTheme();
 
   const [formData, setFormData] = useState(initialFormData);
@@ -78,29 +81,37 @@ export const CargarSiniestro = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const form = formRef.current;
-    if (!form.checkValidity()) {
-      setValidated(true);
-      return;
-    }
-    // Crear trabajador primero
-    try {
-      const trabajador = await createTrabajador(trabajadorData);
-      createSiniestro({
-        formData: { ...formData, trabajadorId: trabajador.id },
-      });
-      toast.success("Siniestro y trabajador creados con éxito");
-      // resetear todo
-      setFormData(initialFormData);
-      setTrabajadorData(initialTrabajador);
-      setValidated(false);
-      form.classList.remove("was-validated");
-    } catch (err) {
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  const form = formRef.current;
+  if (!form.checkValidity()) {
+    setValidated(true);
+    return;
+  }
+  let trabajador = null;
+  try {
+    trabajador = await createTrabajador(trabajadorData);
+    await createSiniestro({
+      formData: { ...formData, trabajadorId: trabajador.id },
+    });
+    toast.success("Siniestro y trabajador creados con éxito");
+    setFormData(initialFormData);
+    setTrabajadorData(initialTrabajador);
+    setValidated(false);
+    form.classList.remove("was-validated");
+  } catch (err) {
+    if (trabajador && trabajador.id) {
+      try {
+        await deleteTrabajador({ id: trabajador.id });
+        toast.error("Error al crear siniestro. Trabajador eliminado.");
+      } catch (delErr) {
+        toast.error("Error al crear siniestro y al eliminar trabajador.");
+      }
+    } else {
       toast.error("Ocurrió un error: " + err.message);
     }
-  };
+  }
+};
 
   if (artsLoading) {
     return (

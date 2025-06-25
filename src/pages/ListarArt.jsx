@@ -6,25 +6,26 @@ import { useTheme } from "../utils/ThemeState";
 import { ClienteFormModal } from "../components/clientes/ClienteFormModal";
 import { DeleteConfirmationModal } from "../components/clientes/DeleteConfirmationModal";
 import  useCrearArt  from "../hooks/useCreateArt";
+import { useQueryClient } from '@tanstack/react-query';
 
 export const ListarArt = () => {
   const { data: arts = [], isLoading, error } = useArts();
-  
+  const queryClient = useQueryClient();
   const { theme } = useTheme();
   const deleteMutation = useDeleteArt();
   const updateMutation = useUpdateArt();
   const createMutation = useCrearArt();
   const navigate = useNavigate();
     const [showCreateModal, setShowCreateModal] = useState(false);
-
+  const initialForm = {
+    nombreART: "",
+    nombreAnalista: "",
+    apellidoAnalista: ""
+  }
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedArt, setSelectedArt] = useState(null);
-  const [formData, setFormData] = useState({
-    nombreART: "",
-    nombreAnalista: "",
-    apellidoAnalista: "",
-  });
+  const [formData, setFormData] = useState(initialForm);
 
   const handleShowDeleteModal = (art) => {
     setSelectedArt(art);
@@ -36,8 +37,9 @@ export const ListarArt = () => {
     { idART: selectedArt.idART },
     {
       onSuccess: () => {
-        setShowDeleteModal(false);
         toast.success('¡Eliminado correctamente!');
+        setShowDeleteModal(false);
+        queryClient.invalidateQueries(['arts']);
       },
       onError: () => {
         toast.error('Error al eliminar.');
@@ -84,6 +86,8 @@ export const ListarArt = () => {
     {
       onSuccess: () => {
         setShowCreateModal(false);
+        queryClient.invalidateQueries({ queryKey: ['arts'] });
+        setFormData(initialForm);
         toast.success('¡ART creado correctamente!');
       },
       onError: () => {
@@ -165,7 +169,7 @@ export const ListarArt = () => {
         <ClienteFormModal
   mode="create"
   show={showCreateModal}
-  initialData={null}
+  initialData={initialForm}
   onCancel={() => setShowCreateModal(false)}
   onSubmit={handleCreateSubmit}
   isSubmitting={createMutation.loading}

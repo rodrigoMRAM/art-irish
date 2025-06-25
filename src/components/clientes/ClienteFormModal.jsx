@@ -60,6 +60,11 @@ export const ClienteFormModal = ({
 
     // Si es válido, invocar callback
     onSubmit(formData);
+    setFormData({
+    nombreART: "",
+    nombreAnalista: "",
+    apellidoAnalista: "",
+  });
   };
 
   if (!show) return null;
@@ -70,7 +75,15 @@ export const ClienteFormModal = ({
         <div className="modal-content shadow">
           <div className="modal-header">
             <h5>{mode === "create" ? "Nuevo cliente" : "Editar cliente"}</h5>
-            <button className="btn-close" onClick={onCancel} />
+            <button className="btn-close" onClick={(e) => {
+    e.preventDefault();
+    setFormData({
+      nombreART: "",
+      nombreAnalista: "",
+      apellidoAnalista: "",
+    });
+    onCancel();
+  }} />
           </div>
 
           <form
@@ -131,7 +144,15 @@ export const ClienteFormModal = ({
   </div>
 
             <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={onCancel}>
+              <button className="btn btn-secondary"  onClick={(e) => {
+    e.preventDefault();
+    setFormData({
+      nombreART: "",
+      nombreAnalista: "",
+      apellidoAnalista: "",
+    });
+    onCancel();
+  }}>
                 Cancelar
               </button>
               <button
@@ -151,18 +172,6 @@ export const ClienteFormModal = ({
           </form>
         </div>
       </div>
-
-      <ToastContainer
-        position="bottom-right"
-        autoClose={1500}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme={theme === "dark" ? "dark" : "light"}
-      />
     </div>
   );
 };

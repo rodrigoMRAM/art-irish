@@ -51,9 +51,6 @@ export const useDeleteArt = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ idART }) => deleteArt({ idART, token }),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['arts']);
-    },
   });
 };
 
