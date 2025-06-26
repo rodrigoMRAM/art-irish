@@ -7,10 +7,16 @@ import {
   useUpdateSiniestro,
   useAssignAnalista,
 } from '../hooks/useSiniestro'; 
+import { useArts } from "../hooks/useGetArt";
 
 export const EditarSiniestro = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const {
+      data: arts = [],
+      isLoading: artsLoading,
+      error: artsError,
+    } = useArts();
   const [formData, setFormData] = useState(() => {
   const stateData = location.state?.formData || {};
   return {
@@ -51,7 +57,18 @@ export const EditarSiniestro = () => {
   }
 };
 
-
+useEffect(() => {
+  if (
+    formData.art &&
+    formData.art.idART &&
+    (!formData.artId || formData.artId === "")
+  ) {
+    setFormData((prev) => ({
+      ...prev,
+      artId: formData.art.idART,
+    }));
+  }
+}, [formData.art]);
 
   return (
     <main className="mt-5 p-5 col-lg-9 m-auto">
@@ -84,20 +101,25 @@ export const EditarSiniestro = () => {
             />
           </div>
           <div className="col-md-4">
-            <label htmlFor="accidentado" className="form-label dark-mode">
-              Accidentado
-            </label>
-            <select
-              id="tipoInvestigacion"
-              className="form-select"
-              value={formData.tipoInvestigacion}
-              onChange={handleChange}
-            >
-              <option value="">Seleccione</option>
-              <option value="Tipo 1">...</option>
-              <option value="Tipo 2">...</option>
-            </select>
-          </div>
+          <label htmlFor="artId" className="form-label dark-mode">
+            Cliente (ART)
+          </label>
+          <select
+            id="artId"
+            className="form-select"
+            value={formData.artId}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccione</option>
+            {arts.map((art) => (
+              <option key={art.idART} value={art.idART}>
+                {art.nombreART}
+              </option>
+            ))}
+          </select>
+          <div className="invalid-feedback">Seleccione una ART.</div>
+        </div>
           <hr />
           <h4 className="my-3 text-warning">Lugar y descripción del hecho</h4>
           <div className="col-md-4">
@@ -335,7 +357,7 @@ export const EditarSiniestro = () => {
               Guardar Cambios
             </button>
             <button
-              type="submit"
+            type="button"
               className="btn btn-danger px-3 float-end mx-3"
               onClick={() => navigate("/siniestros/listar")}
             >
