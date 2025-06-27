@@ -1,253 +1,314 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import useCreateAsegurado from "../hooks/useCreateAsegurado";
 import { ToastContainer, toast } from "react-toastify";
 import { useTheme } from "../utils/ThemeState";
 
 export const CargarAsegurado = () => {
   const { theme } = useTheme();
-  const initialFormState = {
+  const {
+    crearAsegurado,
+    crearAseguradoAsync,
+    isLoading,
+    isError,
+    error,
+  } = useCreateAsegurado();
+
+  const formRef = useRef(null);
+  const contactFormRef = useRef(null);
+
+  // --- Estado principal ---
+  const [form, setForm] = useState({
     nombre: "",
     cuit: "",
     telefono: "",
     telefono2: "",
     email: "",
     empresa: "",
+    nombreFantasia: "",
     prestadorMedico: "",
-    contactosAsegurado: [
-      {
-        nombre: "",
-        apellido: "",
-        dni: "",
-        sector: "",
-        telefono: "",
-        telefono2: "",
-        email: "",
-      },
-    ],
-  };
-  const [form, setForm] = useState(initialFormState);
-  const { crearAsegurado, isLoading, isSuccess, isError, error } =
-    useCreateAsegurado();
+  });
+  const [validatedMain, setValidatedMain] = useState(false);
 
-  const handleChange = (e) => {
+  // --- Estado de contactos ---
+  const emptyContact = {
+    nombre: "",
+    apellido: "",
+    dni: "",
+    sector: "",
+    telefono: "",
+    telefono2: "",
+    email: "",
+  };
+  const [contactos, setContactos] = useState([]);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [contact, setContact] = useState(emptyContact);
+  const [validatedContact, setValidatedContact] = useState(false);
+
+  // Limpieza de validaciones al montar
+  useEffect(() => {
+    formRef.current?.classList.remove("was-validated");
+    contactFormRef.current?.classList.remove("was-validated");
+  }, []);
+
+  // Handlers for main form
+  const handleMainChange = (e) => {
     const { id, value } = e.target;
     setForm((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleContactoChange = (e, index) => {
-    const { id, value } = e.target;
-    setForm((prev) => {
-      const contactos = [...prev.contactosAsegurado];
-      contactos[index][id] = value;
-      return { ...prev, contactosAsegurado: contactos };
-    });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleMainSubmit = (e) => {
     e.preventDefault();
-
-    try {
-      await crearAsegurado({
+    const f = formRef.current;
+    // valida campos + al menos un contacto
+    if (!f.checkValidity() || contactos.length < 1) {
+      setValidatedMain(true);
+      return;
+    }
+    crearAsegurado(
+      {
         ...form,
-        cuit: Number(form.cuit),
-        contactosAsegurado: form.contactosAsegurado.map((c) => ({
+        contactosAsegurado: contactos.map((c) => ({
           ...c,
           dni: Number(c.dni),
         })),
-      });
-      setForm(initialFormState);
-      toast.success("Asegurado creado con éxito");
-    } catch (error) {
-      toast.error("Ocurrió un error al crear el asegurado");
-      console.error(error);
+      },
+      {
+        onSuccess: () => {
+          toast.success("Asegurado creado con éxito");
+          // reset todo
+          setForm({
+            nombre: "",
+            cuit: "",
+            telefono: "",
+            telefono2: "",
+            email: "",
+            empresa: "",
+            prestadorMedico: "",
+          });
+          setContactos([]);
+          setValidatedMain(false);
+          f.classList.remove("was-validated");
+        },
+        onError: (err) => {
+          toast.error("Error al crear asegurado: " + err.message);
+        },
+      }
+    );
+  };
+
+  // Handlers for contact modal
+  const openContactModal = () => {
+    setContact(emptyContact);
+    setValidatedContact(false);
+    setShowContactModal(true);
+  };
+  const closeContactModal = () => setShowContactModal(false);
+
+  const handleContactChange = (e) => {
+    const { id, value } = e.target;
+    setContact((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleAddContact = (e) => {
+    e.preventDefault();
+    const f = contactFormRef.current;
+    if (!f.checkValidity()) {
+      setValidatedContact(true);
+      return;
     }
+    setContactos((prev) => [...prev, contact]);
+    setShowContactModal(false);
+  };
+  const handleRemoveContact = (indexToRemove) => {
+    setContactos((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
   return (
-    <main className="mt-5 p-5 col-lg-6 m-auto">
-      <form onSubmit={handleSubmit}>
-        <div className="d-flex align-items-center justify-content-between gap-2">
-          <h1 className="h3 fw-normal">Cargar Asegurado</h1>
-        </div>
-        <div className="d-flex gap-3">
-          <div className="form-floating mb-3 col-md-6">
-            <input
-              type="text"
-              className="form-control"
-              id="nombre"
-              onChange={handleChange}
-              required
-            />
-            <label htmlFor="nombre">Nombre</label>
-          </div>
-          <div className="form-floating mb-3 col-md-6">
-            <input
-              type="text"
-              className="form-control"
-              id="cuit"
-              onChange={handleChange}
-              required
-            />
-            <label htmlFor="cuit">CUIT</label>
-          </div>
-        </div>
-        <div className="d-flex gap-3">
-          <div className="form-floating mb-3 col-md-6">
-            <input
-              type="tel"
-              className="form-control"
-              id="telefono"
-              onChange={handleChange}
-              required
-            />
-            <label htmlFor="telefono">Teléfono</label>
-          </div>
-          <div className="form-floating mb-3 col-md-6">
-            <input
-              type="tel"
-              className="form-control"
-              id="telefono2"
-              onChange={handleChange}
-            />
-            <label htmlFor="telefono2">Teléfono (opcional)</label>
-          </div>
-        </div>
-        <div className="form-floating mb-3">
-          <input
-            type="email"
-            className="form-control"
-            id="email"
-            onChange={handleChange}
-            required
-          />
-          <label htmlFor="email">E-mail</label>
-        </div>
-        <div className="form-floating mb-3">
-          <input
-            type="text"
-            className="form-control"
-            id="empresa"
-            onChange={handleChange}
-            required
-          />
-          <label htmlFor="empresa">Razón social</label>
-        </div>
-        <div className="form-floating mb-3">
-          <input
-            type="text"
-            className="form-control"
-            id="empresa"
-            onChange={handleChange}
-            required
-          />
-          <label htmlFor="empresa">Nombre de fantasía</label>
-        </div>
-        <div className="form-floating mb-3">
-          <input
-            type="text"
-            className="form-control"
-            id="prestadorMedico"
-            onChange={handleChange}
-            required
-          />
-          <label htmlFor="prestadorMedico">Ingrese prestador médico</label>
-        </div>
-        <button className="btn btn-warning float-end" type="submit">
-          Agregar
-        </button>
+    <main className="mt-5 p-5 col-lg-8 mx-auto">
+      <h2 className="h3 mb-4">Cargar Asegurado</h2>
 
-        <h5 className="mt-4">Contacto del Asegurado</h5>
-        <div className="form-floating mb-3">
-          <input
-            type="text"
-            className="form-control"
-            id="nombre"
-            onChange={(e) => handleContactoChange(e, 0)}
-            required
-          />
-          <label htmlFor="nombre">Nombre</label>
-        </div>
-        <div className="form-floating mb-3">
-          <input
-            type="text"
-            className="form-control"
-            id="apellido"
-            onChange={(e) => handleContactoChange(e, 0)}
-            required
-          />
-          <label htmlFor="apellido">Apellido</label>
-        </div>
-        <div className="form-floating mb-3">
-          <input
-            type="text"
-            className="form-control"
-            id="dni"
-            onChange={(e) => handleContactoChange(e, 0)}
-            required
-          />
-          <label htmlFor="dni">DNI</label>
-        </div>
-        <div className="form-floating mb-3">
-          <input
-            type="text"
-            className="form-control"
-            id="sector"
-            onChange={(e) => handleContactoChange(e, 0)}
-            required
-          />
-          <label htmlFor="sector">Sector</label>
-        </div>
-        <div className="d-flex gap-3">
-          <div className="form-floating mb-3 col-md-6">
-            <input
-              type="tel"
-              className="form-control"
-              id="telefono"
-              onChange={(e) => handleContactoChange(e, 0)}
-              required
-            />
-            <label htmlFor="telefono">Teléfono</label>
-          </div>
-          <div className="form-floating mb-3 col-md-6">
-            <input
-              type="tel"
-              className="form-control"
-              id="telefono2"
-              onChange={(e) => handleContactoChange(e, 0)}
-            />
-            <label htmlFor="telefono2">Teléfono alternativo</label>
-          </div>
-        </div>
-        <div className="form-floating mb-3">
-          <input
-            type="email"
-            className="form-control"
-            id="email"
-            onChange={(e) => handleContactoChange(e, 0)}
-            required
-          />
-          <label htmlFor="email">Email</label>
+      <form
+        ref={formRef}
+        className={`needs-validation ${validatedMain ? "was-validated" : ""}`}
+        noValidate
+        onSubmit={handleMainSubmit}
+      >
+        <div className="row g-3">
+          {/* Campos principales */}
+          {[
+            { id: "nombre", label: "Nombre", type: "text" },
+            { id: "cuit", label: "CUIT", type: "text" },
+            { id: "telefono", label: "Teléfono", type: "tel" },
+            {
+              id: "telefono2",
+              label: "Teléfono 2",
+              type: "tel",
+              required: false,
+            },
+            { id: "email", label: "E-mail", type: "email" },
+            { id: "empresa", label: "Razón Social", type: "text" },
+            { id: "nombreFantasia", label: "Nombre de fantasía", type: "text" },
+            { id: "prestadorMedico", label: "Prestador Médico", type: "text" },
+          ].map(({ id, label, type, required = true }) => (
+            <div className="col-md-6" key={id}>
+              <div className="form-floating">
+                <input
+                  type={type}
+                  className="form-control"
+                  id={id}
+                  placeholder={label}
+                  value={form[id]}
+                  onChange={handleMainChange}
+                  required={required}
+                />
+                <label htmlFor={id}>{label}</label>
+                <div className="invalid-feedback">
+                  Por favor ingresa {label.toLowerCase()}.
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {isError && <div className="alert alert-danger">{error.message}</div>}
+        {/* Sección contactos */}
+        <div className="mt-4">
+          <h5>
+            Contactos{" "}
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-warning ms-3"
+              onClick={openContactModal}
+            >
+              Agregar contacto
+            </button>
+          </h5>
+          {validatedMain && contactos.length < 1 && (
+            <div className="text-danger mb-2">
+              Debes agregar al menos un contacto.
+            </div>
+          )}
+          <ul className="list-group">
+            {contactos.length === 0 ? (
+              <li className="list-group-item text-muted">
+                Agrega al menos un contacto.
+              </li>
+            ) : (
+              contactos.map((c, idx) => (
+                <li
+                  className="list-group-item d-flex justify-content-between align-items-center"
+                  key={idx}
+                >
+                  <div>
+                    {c.nombre} {c.apellido} – DNI: {c.dni} – Tel: {c.telefono} –{" "}
+                    {c.sector}
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={() => handleRemoveContact(idx)}
+                  >
+                    &times;
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
 
-        <button
-          className="btn btn-warning float-end"
-          type="submit"
-          disabled={isLoading}
-        >
-          {isLoading ? "Guardando..." : "Guardar"}
-        </button>
+        {/* Botón guardar */}
+        <div className="d-flex justify-content-end mt-4">
+          <button
+            className="btn btn-warning"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? "Guardando..." : "Guardar Asegurado"}
+          </button>
+        </div>
+
+        {isError && (
+          <div className="alert alert-danger mt-3">{error.message}</div>
+        )}
       </form>
+
+      {/* Modal de contacto */}
+      {showContactModal && (
+        <div className="modal show d-block" tabIndex="-1" role="dialog">
+          <div className="modal-dialog modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <form
+                ref={contactFormRef}
+                className={`needs-validation ${
+                  validatedContact ? "was-validated" : ""
+                }`}
+                noValidate
+                onSubmit={handleAddContact}
+              >
+                <div className="modal-header">
+                  <h5 className="modal-title">Agregar Contacto</h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={closeContactModal}
+                  />
+                </div>
+                <div className="modal-body">
+                  <div className="row g-3">
+                    {[
+                      { id: "nombre", label: "Nombre", type: "text" },
+                      { id: "apellido", label: "Apellido", type: "text" },
+                      { id: "dni", label: "DNI", type: "text" },
+                      { id: "sector", label: "Sector", type: "text" },
+                      { id: "telefono", label: "Teléfono", type: "tel" },
+                      {
+                        id: "telefono2",
+                        label: "Teléfono 2",
+                        type: "tel",
+                        required: false,
+                      },
+                      { id: "email", label: "Email", type: "email" },
+                    ].map(({ id, label, type, required = true }) => (
+                      <div className="col-md-6" key={id}>
+                        <div className="form-floating">
+                          <input
+                            type={type}
+                            className="form-control"
+                            id={id}
+                            placeholder={label}
+                            value={contact[id]}
+                            onChange={handleContactChange}
+                            required={required}
+                          />
+                          <label htmlFor={id}>{label}</label>
+                          <div className="invalid-feedback">
+                            Por favor ingresa {label.toLowerCase()}.
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={closeContactModal}
+                  >
+                    Cancelar
+                  </button>
+                  <button type="submit" className="btn btn-warning">
+                    Agregar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
       <ToastContainer
         position="bottom-right"
-        autoClose={1500}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
+        autoClose={3000}
         theme={theme === "dark" ? "dark" : "light"}
       />
     </main>
