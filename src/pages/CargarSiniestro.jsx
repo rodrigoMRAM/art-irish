@@ -231,7 +231,7 @@ export const CargarSiniestro = () => {
             label: "Teléfono",
             placeholder: "01123456789",
             type: "tel",
-            required: false,
+            required: true,
           },
           {
             id: "trabajador_telefono2",
@@ -239,7 +239,7 @@ export const CargarSiniestro = () => {
             label: "Teléfono 2 (opcional)",
             placeholder: "01123456789",
             type: "tel",
-            required: false,
+            required: true,
           },
           {
             id: "trabajador_email",
@@ -569,6 +569,7 @@ export const CargarSiniestro = () => {
             placeholder="observaciones..."
             value={formData.observaciones}
             onChange={handleChange}
+            required
           />
           <div className="invalid-feedback">Describa las observaciones.</div>
         </div>
