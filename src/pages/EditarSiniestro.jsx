@@ -1,4 +1,4 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   useSiniestros,
@@ -31,14 +31,15 @@ const initialTrabajador = {
 export const EditarSiniestro = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [validated, setValidated] = useState(false);
+  const formRef = useRef(null);
   const { theme } = useTheme();
   const updateTrabajador = useUpdateTrabajador();
+  const updateMutation = useUpdateSiniestro();
+  const deleteMutation = useDeleteSiniestro();
   const [trabajadorData, setTrabajadorData] = useState(initialTrabajador);
-  const {
-    data: arts = [],
-    isLoading: artsLoading,
-    error: artsError,
-  } = useArts();
+  const {data: arts = [],isLoading: artsLoading,error: artsError,} = useArts();
+
   const [formData, setFormData] = useState(() => {
     const stateData = location.state?.formData || {};
     return {
@@ -46,15 +47,20 @@ export const EditarSiniestro = () => {
       analistaId: stateData.analista?.id ?? "",
     };
   });
-  console.log(formData)
 
-  const updateMutation = useUpdateSiniestro();
-  const deleteMutation = useDeleteSiniestro();
+  
+
   useEffect(() => {
     if (location.state?.formData) {
       setFormData(location.state.formData);
     }
   }, [location.state]);
+
+  useEffect(() => {
+  setValidated(false);
+  formRef.current?.classList.remove("was-validated");
+}, []);
+
 
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
@@ -77,7 +83,12 @@ export const EditarSiniestro = () => {
     }
   };
   const handleSubmit = async (e) => {
-    e.preventDefault();
+     e.preventDefault();
+  const form = formRef.current;
+  if (!form.checkValidity()) {
+    setValidated(true);
+    return;
+  }
     try {
       // Actualizar trabajador
       if (formData.trabajador?.id) {
@@ -120,7 +131,7 @@ export const EditarSiniestro = () => {
     <main className="mt-5 p-5 col-lg-9 m-auto">
       <div>
         <h2 className="my-3">Editar Siniestro {formData.numStro}</h2>
-        <form className="row g-3" onSubmit={handleSubmit}>
+        <form ref={formRef} className={`row g-3 needs-validation ${validated ? "was-validated" : ""}`} noValidate onSubmit={handleSubmit}>
           <div className="col-md-4">
             <label htmlFor="numStro" className="form-label dark-mode">
               Número de Stro.
@@ -214,7 +225,7 @@ export const EditarSiniestro = () => {
               label: "Teléfono 2 (opcional)",
               placeholder: "01123456789",
               type: "tel",
-              required: true,
+              required: false,
             },
             {
               id: "trabajador_email",
@@ -523,7 +534,7 @@ export const EditarSiniestro = () => {
               placeholder="observaciones..."
               value={formData.observaciones}
               onChange={handleChange}
-              required
+              
             />
             <div className="invalid-feedback">Describa las observaciones.</div>
           </div>
