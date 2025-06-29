@@ -2,16 +2,13 @@ import React, { useState, useRef, useEffect } from "react";
 import useCreateAsegurado from "../hooks/useCreateAsegurado";
 import { ToastContainer, toast } from "react-toastify";
 import { useTheme } from "../utils/ThemeState";
+import { MdPersonAdd } from "react-icons/md";
+
 
 export const CargarAsegurado = () => {
   const { theme } = useTheme();
-  const {
-    crearAsegurado,
-    crearAseguradoAsync,
-    isLoading,
-    isError,
-    error,
-  } = useCreateAsegurado();
+  const { crearAsegurado, crearAseguradoAsync, isLoading, isError, error } =
+    useCreateAsegurado();
 
   const formRef = useRef(null);
   const contactFormRef = useRef(null);
@@ -25,6 +22,9 @@ export const CargarAsegurado = () => {
     email: "",
     empresa: "",
     nombreFantasia: "",
+    domicilio: "",
+    localidad: "",
+    cp: "",
     prestadorMedico: "",
   });
   const [validatedMain, setValidatedMain] = useState(false);
@@ -83,6 +83,10 @@ export const CargarAsegurado = () => {
             telefono2: "",
             email: "",
             empresa: "",
+            nombreFantasia: "",
+            domicilio: "",
+            localidad: "",
+            cp: "",
             prestadorMedico: "",
           });
           setContactos([]);
@@ -136,21 +140,55 @@ export const CargarAsegurado = () => {
         <div className="row g-3">
           {/* Campos principales */}
           {[
-            { id: "nombre", label: "Nombre", type: "text" },
-            { id: "cuit", label: "CUIT", type: "text" },
-            { id: "telefono", label: "Teléfono", type: "tel" },
+            { id: "nombre", label: "Nombre", type: "text", className: "col-md-6" },
+            { id: "cuit", label: "CUIT", type: "text", className: "col-md-6" },
+            { id: "telefono", label: "Teléfono", type: "tel", className: "col-md-4" },
             {
               id: "telefono2",
               label: "Teléfono 2",
               type: "tel",
               required: false,
+              className: "col-md-4",
             },
-            { id: "email", label: "E-mail", type: "email" },
-            { id: "empresa", label: "Razón Social", type: "text" },
-            { id: "nombreFantasia", label: "Nombre de fantasía", type: "text" },
-            { id: "prestadorMedico", label: "Prestador Médico", type: "text", required: false },
-          ].map(({ id, label, type, required = true }) => (
-            <div className="col-md-6" key={id}>
+            { id: "email", label: "E-mail", type: "email", className: "col-md-4" },
+            { id: "empresa", label: "Razón Social", type: "text", className: "col-md-6" },
+            {
+              id: "nombreFantasia",
+              label: "Nombre de fantasía",
+              type: "text",
+              required: false,
+              className: "col-md-6",
+            },
+            {
+              id: "domicilio",
+              label: "Dirección",
+              type: "text",
+              required: false,
+              className: "col-md-3",
+            },
+            {
+              id: "localidad",
+              label: "Localidad",
+              type: "text",
+              required: false,
+              className: "col-md-3",
+            },
+            {
+              id: "cp",
+              label: "C.P.",
+              type: "number",
+              required: false,
+              className: "col-md-2",
+            },
+            {
+              id: "prestadorMedico",
+              label: "Prestador Médico",
+              type: "text",
+              required: false,
+              className: "col-md-4",
+            },
+          ].map(({ id, label, type, required = true, className }) => (
+            <div className={className} key={id}>
               <div className="form-floating">
                 <input
                   type={type}
@@ -179,7 +217,8 @@ export const CargarAsegurado = () => {
               className="btn btn-sm btn-outline-warning ms-3"
               onClick={openContactModal}
             >
-              Agregar contacto
+              <MdPersonAdd />
+               {"  "} Agregar contacto
             </button>
           </h5>
           {validatedMain && contactos.length < 1 && (

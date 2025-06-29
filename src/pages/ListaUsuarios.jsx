@@ -3,6 +3,12 @@ import { useTheme } from "../utils/ThemeState";
 import useListaUsuarios from "../hooks/useListaUsuarios";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
+import { BsPersonFillAdd } from "react-icons/bs";
+import { MdEmail } from "react-icons/md";
+import { FaEdit } from "react-icons/fa";
+import { RiDeleteBin6Fill } from "react-icons/ri";
+
+
 import 'react-toastify/dist/ReactToastify.css';
 
 export const ListaUsuarios = () => {
@@ -63,20 +69,14 @@ export const ListaUsuarios = () => {
 
   return (
     <main className="mt-5 px-5 overflow-y-auto">
-      {/* Aquí puedes eliminar el mensaje success ya que toast lo reemplaza */}
-      {/* {success && (
-        <div className="text-center">
-          <p className="alert alert-info">Usuario actualizado con éxito.</p>
-        </div>
-      )} */}
 
       <div className="d-flex justify-content-between align-items-center pt-5">
-        <h2>Lista de Usuarios</h2>
+        <h2>Usuarios</h2>
         <button
-          className="btn btn-warning mb-3"
+          className="btn btn-warning mb-3 d-flex align-items-center gap-1"
           onClick={() => navigate("/registro")}
         >
-          Nuevo Usuario
+        <BsPersonFillAdd />  Nuevo Usuario
         </button>
       </div>
 
@@ -89,7 +89,7 @@ export const ListaUsuarios = () => {
           <tr>
             <th>DNI</th>
             <th>Nombre y apellido</th>
-            <th>Email</th>
+            <th className="d-flex align-items-center gap-1"><MdEmail /> E-mail</th>
             <th>Rol</th>
             <th></th>
           </tr>
@@ -118,18 +118,18 @@ export const ListaUsuarios = () => {
                   >
                     <li>
                       <button
-                        className="dropdown-item"
+                        className="dropdown-item d-flex align-items-center gap-1"
                         onClick={() => handleShowEditModal(usuario)}
                       >
-                        Editar
+                       <FaEdit /> Editar
                       </button>
                     </li>
                     <li>
                       <button
-                        className="dropdown-item text-danger"
+                        className="dropdown-item text-danger d-flex align-items-center gap-1"
                         onClick={() => handleShowDeleteModal(usuario)}
                       >
-                        Eliminar
+                      <RiDeleteBin6Fill />  Eliminar
                       </button>
                     </li>
                   </ul>
@@ -270,20 +270,6 @@ export const ListaUsuarios = () => {
                   </div>
 
                   <div className="form-floating mb-3">
-                    <input
-                      type="password"
-                      name="contra"
-                      value={formData.contra}
-                      onChange={handleEditChange}
-                      className="form-control"
-                      id="contra"
-                      placeholder="Contraseña"
-                      required
-                    />
-                    <label htmlFor="contra">Contraseña</label>
-                  </div>
-
-                  <div className="form-floating mb-3">
                     <select
                       name="rol"
                       value={formData.rol}
@@ -312,7 +298,7 @@ export const ListaUsuarios = () => {
       {/* Toast Container para mostrar los mensajes */}
       <ToastContainer
         position="bottom-right"
-        autoClose={1500}
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick

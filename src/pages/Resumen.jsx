@@ -8,6 +8,8 @@ export const Resumen = () => {
   const location = useLocation();
   const { formData } = location.state || {};
 
+  console.log("formData", formData);
+
   const mostrar = (valor) => {
     if (valor === null || valor === undefined || valor === "") {
       return "Sin datos";
@@ -61,13 +63,11 @@ export const Resumen = () => {
             </p>
             <p>
               <strong className="text-warning">Cliente (ART):</strong>{" "}
-              {`${mostrar(art.nombreART)}${
-                art.nombreAnalista
-                  ? ` (${mostrar(art.nombreAnalista)} ${mostrar(
-                      art.apellidoAnalista
-                    )})`
-                  : ""
-              }`}
+              {mostrar(art.nombreART)}
+            </p>
+            <p>
+              <strong className="text-warning">Analista Externo:</strong>{" "}
+              {mostrar(art.nombreAnalista + " " + art.apellidoAnalista)}
             </p>
           </div>
           <div className="text-end">
@@ -78,6 +78,10 @@ export const Resumen = () => {
             <p>
               <strong className="text-warning">Fecha de Vto:</strong>{" "}
               {mostrarFecha(formData.fecha_vencimiento)}
+            </p>
+            <p>
+              <strong className="text-warning">Estado:</strong>{" "}
+              <span className="text-success">{mostrar(formData.estado)}</span>
             </p>
           </div>
         </div>

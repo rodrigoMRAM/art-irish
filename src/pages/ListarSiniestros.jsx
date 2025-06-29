@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { VscArrowSmallDown, VscArrowSmallUp  } from "react-icons/vsc";
+import { FaEdit } from "react-icons/fa";
+import { RiDeleteBin6Fill } from "react-icons/ri";
+import { IoIosAddCircle } from "react-icons/io";
 
 import { useTheme } from "../utils/ThemeState";
 import {
@@ -235,10 +238,10 @@ export const ListarSiniestros = () => {
           )}
         </div>
         <button
-          className="btn btn-warning mb-3"
+          className="btn btn-warning mb-3 d-flex align-items-center gap-1"
           onClick={() => navigate("/siniestros")}
         >
-          Nvo. Siniestro
+        <IoIosAddCircle /> Nvo. Siniestro
         </button>
       </div>
       <br />
@@ -380,18 +383,20 @@ export const ListarSiniestros = () => {
                         </li>
                         <li>
                           <button
+                            style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
                             className="dropdown-item"
                             onClick={() => handleEdit(data)}
                           >
-                            Editar
+                            <FaEdit /> {" "} Editar
                           </button>
                         </li>
                         <li>
                           <button
+                            style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
                             className="dropdown-item text-danger"
                             onClick={() => handleShowModal(data)}
                           >
-                            Eliminar
+                           <RiDeleteBin6Fill /> Eliminar
                           </button>
                         </li>
                       </ul>

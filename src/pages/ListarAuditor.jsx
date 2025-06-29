@@ -96,7 +96,7 @@ export const ListarAuditor = () => {
   return (
     <main className="mt-5 px-5 overflow-y-auto">
       <div className="d-flex justify-content-between align-items-center pt-5">
-        <h2>Lista de Auditores</h2>
+        <h2>Auditores</h2>
         <button
           className="btn btn-warning mb-3"
           onClick={handleOpenCreateModal}
@@ -197,7 +197,7 @@ export const ListarAuditor = () => {
 
       <ToastContainer
         position="bottom-right"
-        autoClose={1500}
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick

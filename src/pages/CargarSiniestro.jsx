@@ -4,12 +4,15 @@ import { ToastContainer, toast } from "react-toastify";
 import { useTheme } from "../utils/ThemeState";
 import { useArts } from "../hooks/useGetArt";
 import { useCreateTrabajador } from "../hooks/useCreateTrabajador";
-import { useDeleteTrabajador } from "../hooks/useDeleteTrabajador"; // asegurate de tener este hook
+import { useDeleteTrabajador } from "../hooks/useDeleteTrabajador";
+import { useGetAsegurados } from "../hooks/useGetAsegurados";
+import { Link } from "react-router-dom";
 
 const initialFormData = {
   numStro: "",
   fechaYHoraStro: "",
   artId: "",
+  aseguradoId: "",
   tipoStro: "",
   lugar_direccion: "",
   lugar_entrecalles: "",
@@ -46,8 +49,15 @@ export const CargarSiniestro = () => {
     isLoading: artsLoading,
     error: artsError,
   } = useArts();
+  const {
+    data: asegurados = [],
+    isLoading: asegLoading,
+    error: asegError,
+  } = useGetAsegurados();
+
   const { mutateAsync: createTrabajador } = useCreateTrabajador();
-  const { mutateAsync: createSiniestro, isLoading: loading } = useCrearSiniestro();
+  const { mutateAsync: createSiniestro, isLoading: loading } =
+    useCrearSiniestro();
   const { mutateAsync: deleteTrabajador } = useDeleteTrabajador();
 
   const { theme } = useTheme();
@@ -56,7 +66,6 @@ export const CargarSiniestro = () => {
   const [trabajadorData, setTrabajadorData] = useState(initialTrabajador);
   const [validated, setValidated] = useState(false);
   const formRef = useRef(null);
-
   // Reset validation when modal/form mounts
   useEffect(() => {
     setValidated(false);
@@ -81,37 +90,37 @@ export const CargarSiniestro = () => {
     }
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  const form = formRef.current;
-  if (!form.checkValidity()) {
-    setValidated(true);
-    return;
-  }
-  let trabajador = null;
-  try {
-    trabajador = await createTrabajador(trabajadorData);
-    await createSiniestro({
-      formData: { ...formData, trabajadorId: trabajador.id },
-    });
-    toast.success("Siniestro y trabajador creados con éxito");
-    setFormData(initialFormData);
-    setTrabajadorData(initialTrabajador);
-    setValidated(false);
-    form.classList.remove("was-validated");
-  } catch (err) {
-    if (trabajador && trabajador.id) {
-      try {
-        await deleteTrabajador({ id: trabajador.id });
-        toast.error("Error al crear siniestro. Trabajador eliminado.");
-      } catch (delErr) {
-        toast.error("Error al crear siniestro y al eliminar trabajador.");
-      }
-    } else {
-      toast.error("Ocurrió un error: " + err.message);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const form = formRef.current;
+    if (!form.checkValidity()) {
+      setValidated(true);
+      return;
     }
-  }
-};
+    let trabajador = null;
+    try {
+      trabajador = await createTrabajador(trabajadorData);
+      await createSiniestro({
+        formData: { ...formData, trabajadorId: trabajador.id },
+      });
+      toast.success("Siniestro y trabajador creados con éxito");
+      setFormData(initialFormData);
+      setTrabajadorData(initialTrabajador);
+      setValidated(false);
+      form.classList.remove("was-validated");
+    } catch (err) {
+      if (trabajador && trabajador.id) {
+        try {
+          await deleteTrabajador({ id: trabajador.id });
+          toast.error("Error al crear siniestro. Trabajador eliminado.");
+        } catch (delErr) {
+          toast.error("Error al crear siniestro y al eliminar trabajador.");
+        }
+      } else {
+        toast.error("Ocurrió un error: " + err.message);
+      }
+    }
+  };
 
   if (artsLoading) {
     return (
@@ -140,7 +149,7 @@ export const CargarSiniestro = () => {
         onSubmit={handleSubmit}
       >
         {/* DATOS SINIESTRO */}
-        <div className="col-md-4">
+        <div className="col-md-6">
           <label htmlFor="numStro" className="form-label dark-mode">
             Número de Stro.
           </label>
@@ -160,7 +169,7 @@ export const CargarSiniestro = () => {
           />
           <div className="invalid-feedback">Ingrese número de siniestro.</div>
         </div>
-        <div className="col-md-4">
+        <div className="col-md-6">
           <label htmlFor="fechaYHoraStro" className="form-label dark-mode">
             Fecha y hora de siniestro
           </label>
@@ -175,7 +184,8 @@ export const CargarSiniestro = () => {
           />
           <div className="invalid-feedback">Seleccione fecha y hora.</div>
         </div>
-        <div className="col-md-4">
+
+        <div className="col-md-6">
           <label htmlFor="artId" className="form-label dark-mode">
             Cliente (ART)
           </label>
@@ -194,6 +204,37 @@ export const CargarSiniestro = () => {
             ))}
           </select>
           <div className="invalid-feedback">Seleccione una ART.</div>
+        </div>
+        {/* --- Nuevo: Seleccionar un asegurado existente --- */}
+        <div className="col-md-6">
+          <div>
+            <label htmlFor="aseguradoId" className="form-label dark-mode">
+              Asegurado
+            </label>
+            <select
+              id="aseguradoId"
+              className="form-select"
+              value={formData.aseguradoId}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Seleccione</option>
+              {asegurados.map((aseg) => (
+                <option key={aseg.idAsegurado} value={aseg.idAsegurado}>
+                  {aseg.empresa} (CUIT: {aseg.cuit})
+                </option>
+              ))}
+            </select>
+            <Link
+              to="/asegurado"
+              className="btn btn-sm btn-outline-warning mt-2 float-end"
+            >
+              Nvo. Asegurado
+            </Link>
+            <div className="invalid-feedback">
+              Seleccione un asegurado o cree uno nuevo.
+            </div>
+          </div>
         </div>
 
         <hr className="mt-4" />
@@ -579,7 +620,7 @@ export const CargarSiniestro = () => {
             className="btn btn-warning float-end"
             disabled={loading}
           >
-            {loading ? "Cargando..." : "Cargar Siniestro"}
+            {loading ? "Cargando..." : "Guardar"}
           </button>
         </div>
       </form>

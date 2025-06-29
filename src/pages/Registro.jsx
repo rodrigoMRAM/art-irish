@@ -233,7 +233,7 @@ const handleSubmit = async (e) => {
       </form>
        <ToastContainer
                position="bottom-right"
-               autoClose={1500}
+               autoClose={3000}
                hideProgressBar={false}
                newestOnTop={false}
                closeOnClick
