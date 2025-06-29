@@ -6,25 +6,47 @@ import {
   useDeleteSiniestro,
   useUpdateSiniestro,
   useAssignAnalista,
-} from '../hooks/useSiniestro'; 
+} from '../hooks/useSiniestro';
 import { useArts } from "../hooks/useGetArt";
+import { useUpdateTrabajador } from "../hooks/useUpdateTrabajador";
+import { ToastContainer, toast } from "react-toastify";
+import { useTheme } from "../utils/ThemeState";
+
+const initialTrabajador = {
+  dni: "",
+  nombre: "",
+  apellido: "",
+  telefono: "",
+  telefono2: "",
+  email: "",
+  calle: "",
+  numero: "",
+  piso: "",
+  depto: "",
+  cp: "",
+  localidad: "",
+  provincia: "",
+};
 
 export const EditarSiniestro = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const updateTrabajador = useUpdateTrabajador();
+  const [trabajadorData, setTrabajadorData] = useState(initialTrabajador);
   const {
-      data: arts = [],
-      isLoading: artsLoading,
-      error: artsError,
-    } = useArts();
+    data: arts = [],
+    isLoading: artsLoading,
+    error: artsError,
+  } = useArts();
   const [formData, setFormData] = useState(() => {
-  const stateData = location.state?.formData || {};
-  return {
-    ...stateData,
-    analista: stateData.analista ?? null, 
-  };
-});
-
+    const stateData = location.state?.formData || {};
+    return {
+      ...stateData,
+      analistaId: stateData.analista?.id ?? "",
+    };
+  });
+  console.log(formData)
 
   const updateMutation = useUpdateSiniestro();
   const deleteMutation = useDeleteSiniestro();
@@ -36,39 +58,64 @@ export const EditarSiniestro = () => {
 
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [id]: type === "checkbox" ? checked : value,
-    });
+
+    // Si es un campo de trabajador (id empieza con "trabajador_")
+    if (id.startsWith("trabajador_")) {
+      const key = id.replace("trabajador_", "");
+      setFormData((prev) => ({
+        ...prev,
+        trabajador: {
+          ...prev.trabajador,
+          [key]: type === "checkbox" ? checked : value,
+        },
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [id]: type === "checkbox" ? checked : value,
+      }));
+    }
   };
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    await updateMutation.mutateAsync({
-      idStro: formData.idStro,
-      updatedData: {
-        ...formData,
-      },
-    });
+    e.preventDefault();
+    try {
+      // Actualizar trabajador
+      if (formData.trabajador?.id) {
+        await updateTrabajador.mutateAsync({
+          id: formData.trabajador.id,
+          data: {
+            ...formData.trabajador,
+          },
+        });
+      }
+      // Actualizar siniestro, enviando todos los datos tal como están (incluido analista)
+      await updateMutation.mutateAsync({
+        idStro: formData.idStro,
+        updatedData: {
+          ...formData,
+          analistaId: formData.analistaId,
+        },
+      });
 
-    navigate("/siniestros/listar");
-  } catch (error) {
-    console.error("Error al actualizar el siniestro:", error);
-  }
-};
+      toast.success("Siniestro editado correctamente");
+      navigate("/siniestros/listar");
+    } catch (error) {
+      console.error("Error al actualizar el siniestro o trabajador:", error);
+    }
+  };
 
-useEffect(() => {
-  if (
-    formData.art &&
-    formData.art.idART &&
-    (!formData.artId || formData.artId === "")
-  ) {
-    setFormData((prev) => ({
-      ...prev,
-      artId: formData.art.idART,
-    }));
-  }
-}, [formData.art]);
+  useEffect(() => {
+    if (
+      formData.art &&
+      formData.art.idART &&
+      (!formData.artId || formData.artId === "")
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        artId: formData.art.idART,
+      }));
+    }
+  }, [formData.art]);
 
   return (
     <main className="mt-5 p-5 col-lg-9 m-auto">
@@ -101,30 +148,173 @@ useEffect(() => {
             />
           </div>
           <div className="col-md-4">
-          <label htmlFor="artId" className="form-label dark-mode">
-            Cliente (ART)
-          </label>
-          <select
-            id="artId"
-            className="form-select"
-            value={formData.artId}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccione</option>
-            {arts.map((art) => (
-              <option key={art.idART} value={art.idART}>
-                {art.nombreART}
-              </option>
-            ))}
-          </select>
-          <div className="invalid-feedback">Seleccione una ART.</div>
-        </div>
+            <label htmlFor="artId" className="form-label dark-mode">
+              Cliente (ART)
+            </label>
+            <select
+              id="artId"
+              className="form-select"
+              value={formData.artId}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Seleccione</option>
+              {arts.map((art) => (
+                <option key={art.idART} value={art.idART}>
+                  {art.nombreART}
+                </option>
+              ))}
+            </select>
+            <div className="invalid-feedback">Seleccione una ART.</div>
+          </div>
+          <hr className="mt-4" />
+          <h4 className="text-warning">Datos del Trabajador</h4>
+
+          {/* DATOS TRABAJADOR */}
+          {[
+            {
+              id: "trabajador_dni",
+              stateKey: "dni",
+              value: formData.trabajador?.dni,
+              label: "DNI",
+              placeholder: "12345678",
+              type: "number",
+              required: true,
+            },
+            {
+              id: "trabajador_nombre",
+              stateKey: "nombre",
+              value: formData.trabajador?.nombre || "",
+              label: "Nombre",
+              placeholder: "Juan",
+              type: "text",
+              required: true,
+            },
+            {
+              id: "trabajador_apellido",
+              stateKey: "apellido",
+              value: formData.trabajador?.apellido || "",
+              label: "Apellido",
+              placeholder: "Pérez",
+              type: "text",
+              required: true,
+            },
+            {
+              id: "trabajador_telefono",
+              stateKey: "telefono",
+              value: formData.trabajador?.telefono || "",
+              label: "Teléfono",
+              placeholder: "01123456789",
+              type: "tel",
+              required: true,
+            },
+            {
+              id: "trabajador_telefono2",
+              stateKey: "telefono2",
+              value: formData.trabajador?.telefono2 || "",
+              label: "Teléfono 2 (opcional)",
+              placeholder: "01123456789",
+              type: "tel",
+              required: true,
+            },
+            {
+              id: "trabajador_email",
+              stateKey: "email",
+              value: formData.trabajador?.email || "",
+              label: "Email",
+              placeholder: "ejemplo@correo.com",
+              type: "email",
+              required: true,
+            },
+            {
+              id: "trabajador_calle",
+              stateKey: "calle",
+              value: formData.trabajador?.calle || "",
+              label: "Calle",
+              placeholder: "Córdoba",
+              type: "text",
+              required: true,
+            },
+            {
+              id: "trabajador_numero",
+              stateKey: "numero",
+              value: formData.trabajador?.numero || "",
+              label: "Número",
+              placeholder: "1234",
+              type: "text",
+              required: true,
+            },
+            {
+              id: "trabajador_piso",
+              stateKey: "piso",
+              value: formData.trabajador?.piso || "",
+              label: "Piso",
+              placeholder: "1",
+              type: "text",
+              required: true,
+            },
+            {
+              id: "trabajador_depto",
+              stateKey: "depto",
+              value: formData.trabajador?.depto || "",
+              label: "Departamento",
+              placeholder: "A",
+              type: "text",
+              required: true,
+            },
+            {
+              id: "trabajador_cp",
+              stateKey: "cp",
+              value: formData.trabajador?.cp || "",
+              label: "Código Postal",
+              placeholder: "1234",
+              type: "number",
+              required: true,
+            },
+            {
+              id: "trabajador_localidad",
+              stateKey: "localidad",
+              value: formData.trabajador?.localidad || "",
+              label: "Localidad",
+              placeholder: "Avellaneda",
+              type: "text",
+              required: true,
+            },
+            {
+              id: "trabajador_provincia",
+              stateKey: "provincia",
+              value: formData.trabajador?.provincia || "",
+              label: "Provincia",
+              placeholder: "Buenos Aires",
+              type: "text",
+              required: true,
+            },
+          ].map(({ id, stateKey, value, label, placeholder, type, required }) => (
+            <div className="col-md-3" key={id}>
+              <label htmlFor={id} className="form-label dark-mode">
+                {label}
+              </label>
+              <input
+                type={type}
+                className="form-control"
+                id={id}
+                placeholder={`Ej: ${placeholder}`}
+                value={formData.trabajador?.[stateKey] || ""}
+                onChange={handleChange}
+                required={required}
+              />
+              {required && (
+                <div className="invalid-feedback">
+                  {`Ingrese ${label.toLowerCase()}.`}
+                </div>
+              )}
+            </div>
+          ))}
           <hr />
-          <h4 className="my-3 text-warning">Lugar y descripción del hecho</h4>
-          <div className="col-md-4">
+          <h4 className="my-3 text-warning">Ubicación del hecho</h4>
+          <div className="col-md-3">
             <label htmlFor="lugar_direccion" className="form-label dark-mode">
-              Lugar del hecho (Dirección)
+              Dirección
             </label>
             <input
               type="text"
@@ -161,7 +351,7 @@ useEffect(() => {
               placeholder="Ej: Avellaneda"
             />
           </div>
-          <div className="col-md-2">
+          <div className="col-md-3">
             <label htmlFor="provincia" className="form-label dark-mode">
               Provincia
             </label>
@@ -200,22 +390,26 @@ useEffect(() => {
               <option value="Tierra del Fuego">Tierra del Fuego</option>
             </select>
           </div>
-          <div className="mb-3">
-            <label htmlFor="mechanicaHecho" className="form-label dark-mode">
-              Mecánica del Hecho
-            </label>
-            <textarea
-              className="form-control"
-              id="mechanicaHecho"
-              rows="3"
-              value={formData.mechanicaHecho}
-              onChange={handleChange}
-              placeholder="Describa la mecánica de los hechos..."
-            ></textarea>
-          </div>
           <hr />
-          <h4 className="my-3 text-warning">Otros detalles</h4>
-          <div className="col-md-2">
+          <h4 className="my-3 text-warning">Detalles del accidente</h4>
+          <div className="col-md-4">
+            <label htmlFor="tipoSiniestro" className="form-label dark-mode">
+              Tipo de siniestro
+            </label>
+            <select
+              id="tipoStro"
+              className="form-select"
+              value={formData.tipoStro}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Seleccione</option>
+              <option value="In Itínere">In Itínere</option>
+              <option value="Laboral">Laboral</option>
+            </select>
+            <div className="invalid-feedback">Ingrese tipo de siniestro.</div>
+          </div>
+          <div className="col-md-4">
             <label htmlFor="gravedad" className="form-label dark-mode">
               Gravedad
             </label>
@@ -233,7 +427,7 @@ useEffect(() => {
               <option value="Mortal">Mortal</option>
             </select>
           </div>
-          <div className="col-md-3">
+          <div className="col-md-4">
             <label htmlFor="tipoInvestigacion" className="form-label dark-mode">
               Tipo de Investigación
             </label>
@@ -249,7 +443,28 @@ useEffect(() => {
               <option value="Tipo 3">Virtual</option>
             </select>
           </div>
-          <div className="col-md-3">
+          <div className="col-12">
+            <label htmlFor="mechanicaHecho" className="form-label dark-mode">
+              Mecánica del hecho
+            </label>
+            <textarea
+              className="form-control"
+              id="mechanicaHecho"
+              rows="3"
+              placeholder="Describa la mecánica..."
+              value={formData.mechanicaHecho}
+              onChange={handleChange}
+              required
+            />
+            <div className="invalid-feedback">
+              Describa la mecánica del hecho.
+            </div>
+          </div>
+
+
+          <hr />
+          <h4 className="text-warning">Otros datos</h4>
+          <div className="col-md-4">
             <label
               htmlFor="nombrePrestadorMedico"
               className="form-label dark-mode"
@@ -278,86 +493,47 @@ useEffect(() => {
               placeholder="Ingrese Lesiones"
             />
           </div>
-          <div className="mb-3">
+          <div className="col-md-4">
             <label
               htmlFor="patologiasInculpables"
               className="form-label dark-mode"
             >
               Patologías Inculpables
             </label>
-            <textarea
+            <input
+              type="text"
               className="form-control"
               id="patologiasInculpables"
-              rows="3"
+              placeholder="Ej: Hipertensión"
               value={formData.patologiasInculpables}
               onChange={handleChange}
-              placeholder="Ingrese patologías Inculpables..."
-            ></textarea>
-          </div>
-          <div className="col-md-5">
-            <label htmlFor="tipoStro" className="form-label dark-mode">
-              Tipo de Siniestro
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="tipoStro"
-              value={formData.tipoStro}
-              onChange={handleChange}
-              placeholder="Ingrese el tipo de Siniestro"
+              required
             />
+            <div className="invalid-feedback">
+              Ingrese patologías inculpables.
+            </div>
           </div>
-          <div className="col-md-7">
-            <label htmlFor="resultado" className="form-label dark-mode">
-              Resultado
+          <div className="col-12">
+            <label htmlFor="observaciones" className="form-label dark-mode">
+              Observaciones
             </label>
-            <input
-              type="text"
-              className="form-control"
-              id="resultado"
-              value={formData.resultado}
-              onChange={handleChange}
-              placeholder="Ingrese el resultado"
-            />
-          </div>
-          <div className="form-check form-switch col-md-4 mx-2">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              role="switch"
-              id="tieneRecupero"
-              checked={formData.tieneRecupero}
-              onChange={handleChange}
-            />
-            <label
-              className="form-check-label dark-mode"
-              htmlFor="tieneRecupero"
-            >
-              Tiene Recupero
-            </label>
-          </div>
-          <hr />
-          <h4 className="text-warning">Observaciones</h4>
-          <div className="mb-3">
-            <label
-              htmlFor="observaciones"
-              className="form-label dark-mode"
-            ></label>
             <textarea
               className="form-control"
               id="observaciones"
-              rows="1"
+              rows="2"
+              placeholder="observaciones..."
               value={formData.observaciones}
               onChange={handleChange}
-              placeholder="Ingrese observaciones... (opcional)"
-            ></textarea>
+              required
+            />
+            <div className="invalid-feedback">Describa las observaciones.</div>
           </div>
           <div className="col-12">
             <button type="submit" className="btn btn-warning px-3 float-end">
               Guardar Cambios
             </button>
             <button
-            type="button"
+              type="button"
               className="btn btn-danger px-3 float-end mx-3"
               onClick={() => navigate("/siniestros/listar")}
             >
@@ -366,6 +542,11 @@ useEffect(() => {
           </div>
         </form>
       </div>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        theme={theme === "dark" ? "dark" : "light"}
+      />
     </main>
   );
 };
