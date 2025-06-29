@@ -42,9 +42,9 @@ export const Resumen = () => {
     );
   }
 
-  const trabajador = formData.trabajador || {};
-  const asegurado = formData.asegurado || {};
-  const contactos = formData.asegurado.contactosAsegurado || [];
+  const trabajador = formData?.trabajador || {};
+  const asegurado = formData?.asegurado || {};
+  const contactos = formData?.asegurado?.contactosAsegurado || [];
   const art = formData.art || {};
 
   return (
