@@ -43,6 +43,7 @@ export const Resumen = () => {
   }
 
   const trabajador = formData.trabajador || {};
+  const asegurado = formData.asegurado || {};
   const art = formData.art || {};
 
   return (
@@ -86,6 +87,47 @@ export const Resumen = () => {
           </div>
         </div>
 
+        {/* Sección: Datos del Asegurado */}
+        <h2 className="mt-4">Datos del Asegurado</h2>
+        <hr />
+        <div className="justify-content-between d-flex flex-wrap">
+          <div className="col-md-4 mb-3 ">
+            <p>
+              <strong className="text-warning">Nombre:</strong>{" "}
+              {mostrar(asegurado.empresa)}
+            </p>
+            <p>
+              <strong className="text-warning">CUIT:</strong>{" "}
+              {mostrar(asegurado.cuit)}
+            </p>
+            <p>
+              <strong className="text-warning">Teléfono 1:</strong>{" "}
+              {mostrar(asegurado.telefono)}
+            </p>
+            <p>
+              <strong className="text-warning">Teléfono 2:</strong>{" "}
+              {mostrar(asegurado.telefono2)}
+            </p>
+          </div>
+          <div className="col-md-4 mb-3">
+            <p>
+              <strong className="text-warning">Email:</strong>{" "}
+              {mostrar(asegurado.email)}
+            </p>
+            <p>
+              <strong className="text-warning">Dirección:</strong>{" "}
+              {mostrar(asegurado.domicilio)}
+            </p>
+            <p>
+              <strong className="text-warning">Localidad:</strong>{" "}
+              {mostrar(asegurado.localidad)}
+            </p>
+            <p>
+              <strong className="text-warning">Nombre de Fantasía:</strong>{" "}
+              {mostrar(asegurado.nombreFantasia)}
+            </p>
+          </div>
+        </div>
         {/* Sección: Datos del Trabajador */}
         <h2 className="mt-4">Datos del Trabajador</h2>
         <hr />
