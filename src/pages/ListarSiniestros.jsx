@@ -25,7 +25,7 @@ export const ListarSiniestros = () => {
   const [selectedArtId, setSelectedArtId] = useState("");
   const [selectedAnalistaId, setSelectedAnalistaId] = useState("");
   const [page, setPage] = useState(0);
-  const size = 2; // Cantidad de siniestros por página
+  const size = 5; // Cantidad de siniestros por página
   // Ordenamiento por fecha de ingreso (descendente)
   const [sortDir, setSortDir] = useState("desc");
 

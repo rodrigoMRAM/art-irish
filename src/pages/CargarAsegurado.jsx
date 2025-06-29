@@ -148,7 +148,7 @@ export const CargarAsegurado = () => {
             { id: "email", label: "E-mail", type: "email" },
             { id: "empresa", label: "Razón Social", type: "text" },
             { id: "nombreFantasia", label: "Nombre de fantasía", type: "text" },
-            { id: "prestadorMedico", label: "Prestador Médico", type: "text" },
+            { id: "prestadorMedico", label: "Prestador Médico", type: "text", required: false },
           ].map(({ id, label, type, required = true }) => (
             <div className="col-md-6" key={id}>
               <div className="form-floating">

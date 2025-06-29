@@ -239,7 +239,7 @@ export const CargarSiniestro = () => {
             label: "Teléfono 2 (opcional)",
             placeholder: "01123456789",
             type: "tel",
-            required: true,
+            required: false,
           },
           {
             id: "trabajador_email",
@@ -271,7 +271,7 @@ export const CargarSiniestro = () => {
             label: "Piso",
             placeholder: "1",
             type: "text",
-            required: true,
+            required: false, // Piso puede ser opcional
           },
           {
             id: "trabajador_depto",
@@ -279,7 +279,7 @@ export const CargarSiniestro = () => {
             label: "Departamento",
             placeholder: "A",
             type: "text",
-            required: true,
+            required: false, // Depto puede ser opcional
           },
           {
             id: "trabajador_cp",
@@ -516,7 +516,6 @@ export const CargarSiniestro = () => {
             placeholder="Ej: Galeno"
             value={formData.nombrePrestadorMedico}
             onChange={handleChange}
-            required
           />
           <div className="invalid-feedback">
             Ingrese nombre del prestador médico.
@@ -551,7 +550,6 @@ export const CargarSiniestro = () => {
             placeholder="Ej: Hipertensión"
             value={formData.patologiasInculpables}
             onChange={handleChange}
-            required
           />
           <div className="invalid-feedback">
             Ingrese patologías inculpables.
@@ -569,7 +567,6 @@ export const CargarSiniestro = () => {
             placeholder="observaciones..."
             value={formData.observaciones}
             onChange={handleChange}
-            required
           />
           <div className="invalid-feedback">Describa las observaciones.</div>
         </div>
