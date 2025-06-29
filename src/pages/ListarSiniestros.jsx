@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import { VscArrowSmallDown, VscArrowSmallUp  } from "react-icons/vsc";
 import { FaEdit } from "react-icons/fa";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import { IoIosAddCircle } from "react-icons/io";
+import { useLocation } from "react-router-dom";
 
 import { useTheme } from "../utils/ThemeState";
 import {
@@ -15,7 +16,7 @@ import { useArts } from "../hooks/useGetArt";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import formatDate from "../utils/formatDate";
-import { toast } from "react-toastify";
+import {ToastContainer, toast } from "react-toastify";
 import Search from "../assets/icons/search.svg";
 import Close from "../assets/icons/close.svg";
 
@@ -28,6 +29,7 @@ export const ListarSiniestros = () => {
   const [selectedArtId, setSelectedArtId] = useState("");
   const [selectedAnalistaId, setSelectedAnalistaId] = useState("");
   const [page, setPage] = useState(0);
+  const location = useLocation();
   const size = 5; // Cantidad de siniestros por página
   // Ordenamiento por fecha de ingreso (descendente)
   const [sortDir, setSortDir] = useState("desc");
@@ -115,6 +117,14 @@ export const ListarSiniestros = () => {
       }
     );
   };
+
+  useEffect(() => {
+    if (location.state?.toast) {
+      toast.success(location.state.toast);
+      // Limpia el estado para que no se repita el toast al refrescar
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleSelectAnalista = (idStro, value) => {
     assignAnalista.mutate({ idStro, analistaId: value || null });
@@ -512,6 +522,11 @@ export const ListarSiniestros = () => {
           </div>
         </div>
       )}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        theme={theme === "dark" ? "dark" : "light"}
+      />
     </main>
   );
 };

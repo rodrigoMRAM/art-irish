@@ -97,8 +97,7 @@ export const EditarSiniestro = () => {
         },
       });
 
-      toast.success("Siniestro editado correctamente");
-      navigate("/siniestros/listar");
+      navigate("/siniestros/listar", { state: { toast: "Siniestro editado correctamente" } });
     } catch (error) {
       console.error("Error al actualizar el siniestro o trabajador:", error);
     }
