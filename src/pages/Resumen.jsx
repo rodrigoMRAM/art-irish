@@ -44,6 +44,7 @@ export const Resumen = () => {
 
   const trabajador = formData.trabajador || {};
   const asegurado = formData.asegurado || {};
+  const contactos = formData.asegurado.contactosAsegurado || [];
   const art = formData.art || {};
 
   return (
@@ -127,6 +128,27 @@ export const Resumen = () => {
               {mostrar(asegurado.nombreFantasia)}
             </p>
           </div>
+
+          <ul className="list-group w-100">
+            <h5>Contactos:</h5>
+            {contactos.length === 0 ? (
+              <li className="list-group-item text-muted">
+                No hay contactos asignados a este asegurado.
+              </li>
+            ) : (
+              contactos.map((c, idx) => (
+                <li
+                  className="list-group-item d-flex justify-content-between align-items-center"
+                  key={idx}
+                >
+                  <div>
+                <b>{c.nombre} {c.apellido}</b> – DNI: {c.dni} – Tel: {c.telefono} –{" "}
+                    {c.sector}
+                  </div>
+                </li>
+              ))
+            )}
+          </ul>
         </div>
         {/* Sección: Datos del Trabajador */}
         <h2 className="mt-4">Datos del Trabajador</h2>
