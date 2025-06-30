@@ -108,12 +108,13 @@ export const Navbar = () => {
                 </li>
               </ul>
             </li>
-            <button
+            <Link
+              to={"/listar/asegurado"}
               className="btn mx-2 d-flex align-items-center gap-1"
             >
               <FaAddressBook />
               Agenda
-            </button>
+            </Link>
           </ul>
 
 
